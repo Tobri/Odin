@@ -17,10 +17,17 @@ public class MainActivity extends ActionBarActivity {
     Button      btnSend;
     EditText    txtInput;
     EditText    txtOutput;
+    DBConnector dbc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.dbc = new DBConnector();
+        if (this.dbc.UserDefined()) {
+            // Nachrichtenübersicht anzeigen
+        } else {
+            // Loginbildschirm anzeigen
+        }
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
