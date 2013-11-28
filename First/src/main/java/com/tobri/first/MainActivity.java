@@ -1,5 +1,6 @@
 package com.tobri.first;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -12,10 +13,7 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.Button;
 import android.widget.EditText;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 public class MainActivity extends ActionBarActivity {
     protected DBConnector   dbc;
@@ -30,27 +28,26 @@ public class MainActivity extends ActionBarActivity {
         byte            fileContent[] = new byte[512];
         String          username,
                         password;
-        FileInputStream fis = null;
+        File            file = new File(this.lockFileName);
 
-        try {
-            fis = openFileInput(this.lockFileName);
-        } catch (FileNotFoundException fnfe) {
-            //ToDo File anlegen / neuer Programmpfad
+        if (!file.exists()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
         }
 
-        try {
-            fis.read(fileContent, 0, 512);
-        } catch (IOException ioe) {
-            // ToDo: Falls Datei leer / nicht lesbar -> neuer Programmpfad
-        }
-
-        for (int i = 0; i < fileContent.length; i++) {
-            if (':' == fileContent[i]) {
-                username = fileContent.toString().substring(0, i - 1);
-                password = fileContent.toString().substring(i + 1, fileContent.length);
-                break;
-            }
-        }
+//        try {
+//            fis.read(fileContent, 0, 512);
+//        } catch (IOException ioe) {
+//            // ToDo: Falls Datei leer / nicht lesbar -> neuer Programmpfad
+//        }
+//
+//        for (int i = 0; i < fileContent.length; i++) {
+//            if (':' == fileContent[i]) {
+//                username = fileContent.toString().substring(0, i - 1);
+//                password = fileContent.toString().substring(i + 1, fileContent.length);
+//                break;
+//            }
+//        }
 
         this.dbc        = new DBConnector();
         this.oracleCon  = new HTTPConnector();
@@ -58,12 +55,6 @@ public class MainActivity extends ActionBarActivity {
 
 
         setContentView(R.layout.activity_main);
-
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
-        }
     }
 
 
@@ -86,21 +77,4 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-    }
-
 }
