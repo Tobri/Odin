@@ -44,7 +44,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 txtOutput.append(txtInput.getText().subSequence(0, txtInput.getText().length()));
-                txtInput.clearComposingText();
+                txtInput.setText("");
             }
         });
     }
