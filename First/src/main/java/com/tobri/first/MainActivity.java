@@ -13,36 +13,15 @@ import android.os.Build;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 public class MainActivity extends ActionBarActivity {
-    protected String lockFileName = "tobri.lock";
-    protected DBConnector dbc;
+    Button      btnSend;
+    EditText    txtInput;
+    EditText    txtOutput;
+    DBConnector dbc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        FileInputStream fis;
-        byte            fileContent[] = new byte[512];
-        String          username,
-                        password;
-
-        try {
-            if ((fis = openFileInput(this.lockFileName)) != null) {
-                fis.read(fileContent, 0, 512);
-                for (int i = 0; i < fileContent.length; i++) {
-                    if (':' == fileContent[i]) {
-                        username = fileContent.toString().substring(0, i - 1);
-                        password = fileContent.toString().substring(i + 1, fileContent.length);
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            //TODO
-        }
         this.dbc = new DBConnector();
         if (this.dbc.UserDefined()) {
             // Nachrichtenübersicht anzeigen
@@ -56,6 +35,18 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
+        btnSend     = (Button) findViewById(R.id.btnSend);
+        txtInput    = (EditText) findViewById(R.id.txtInput);
+        txtOutput   = (EditText) findViewById(R.id.txtOutput);
+
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                txtOutput.append(txtInput.getText().subSequence(0, txtInput.getText().length()));
+                txtInput.clearComposingText();
+            }
+        });
     }
 
 
