@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,48 +14,70 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.Button;
 import android.widget.EditText;
-import java.io.*;
+import android.widget.TextView;
+import android.widget.Toast;
+import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity {
-    protected DBConnector   dbc;
-    protected HTTPConnector oracleCon;
-    protected HTTPConnector mongoCon;
-    protected String        lockFileName = "garm.lock";
+//    protected DBConnector   dbc;
+//    protected HTTPConnector oracleCon;
+//    protected HTTPConnector mongoCon;
+
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
+
+    // Session Manager Class
+    SessionManager session;
+
+    // Button Logout
+    Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        byte            fileContent[] = new byte[512];
-        String          username,
-                        password;
-        File            file = new File(this.lockFileName);
-
-        if (!file.exists()) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-        }
-
-//        try {
-//            fis.read(fileContent, 0, 512);
-//        } catch (IOException ioe) {
-//            // ToDo: Falls Datei leer / nicht lesbar -> neuer Programmpfad
-//        }
-//
-//        for (int i = 0; i < fileContent.length; i++) {
-//            if (':' == fileContent[i]) {
-//                username = fileContent.toString().substring(0, i - 1);
-//                password = fileContent.toString().substring(i + 1, fileContent.length);
-//                break;
-//            }
-//        }
-
-        this.dbc        = new DBConnector();
-        this.oracleCon  = new HTTPConnector();
-
-
-
         setContentView(R.layout.activity_main);
+
+//        this.dbc        = new DBConnector();
+//        this.oracleCon  = new HTTPConnector();
+
+        // Session class instance
+        session = new SessionManager(getApplicationContext());
+
+        TextView lblName = (TextView) findViewById(R.id.lblName);
+
+        // Button logout
+        btnLogout = (Button) findViewById(R.id.btnLogout);
+
+        /**
+         * Call this function whenever you want to check user login
+         * This will redirect user to LoginActivity is he is not
+         * logged in
+         * */
+        session.checkLogin();
+
+        // get user data from session
+        HashMap<String, String> user = session.getUserDetails();
+
+        // name
+        String name = user.get(SessionManager.KEY_NAME);
+
+        // displaying user data
+        lblName.setText(Html.fromHtml("Name: <b>" + name + "</b>"));
+
+        /**
+         * Logout button click event
+         * */
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // Clear the session data
+                // This will clear all session data and
+                // redirect user to LoginActivity
+                session.logoutUser();
+            }
+        });
+
     }
 
 
