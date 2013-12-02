@@ -24,4 +24,36 @@ public class Message {
         this.message    = message;
         this.optInfo    = optInfo;
     }
+
+    public String getOptInfo() {
+        return optInfo;
+    }
+
+    public void setOptInfo(String optInfo) {
+        this.optInfo = optInfo;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public Date getReceived() {
+        return received;
+    }
+
+    public void setReceived(Date received) {
+        this.received = received;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
