@@ -1,36 +1,46 @@
 package com.tobri.first;
 
-import java.util.Date;
 
 /**
  * Created by studat on 02.12.13.
  */
 public class Message {
+    protected Integer   id;
     protected String    sender;
-    protected Date      received;
+    protected String    received;
     protected String    message;
-    protected String    optInfo;
+    protected String    additional;
 
-    public Message(String sender, Date received, String message) {
+    public Message() { }
+
+    public Message(Integer id, String sender, String received, String message) {
         this.sender     = sender;
         this.received   = received;
         this.message    = message;
-        this.optInfo    = null;
+        this.additional = null;
     }
 
-    public Message(String sender, Date received, String message, String optInfo) {
+    public Message(Integer id, String sender, String received, String message, String additional) {
         this.sender     = sender;
         this.received   = received;
         this.message    = message;
-        this.optInfo    = optInfo;
+        this.additional = additional;
     }
 
-    public String getOptInfo() {
-        return optInfo;
+    public Integer getId() {
+        return id;
     }
 
-    public void setOptInfo(String optInfo) {
-        this.optInfo = optInfo;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getAdditional() {
+        return additional;
+    }
+
+    public void setAdditional(String additional) {
+        this.additional = additional;
     }
 
     public String getSender() {
@@ -41,11 +51,11 @@ public class Message {
         this.sender = sender;
     }
 
-    public Date getReceived() {
+    public String getReceived() {
         return received;
     }
 
-    public void setReceived(Date received) {
+    public void setReceived(String received) {
         this.received = received;
     }
 

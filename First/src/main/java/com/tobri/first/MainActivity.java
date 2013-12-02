@@ -19,9 +19,11 @@ import android.widget.Toast;
 import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity {
-    protected DBConnector   dbc;
 //    protected HTTPConnector oracleCon;
 //    protected HTTPConnector mongoCon;
+
+    // Database Connector
+    protected DBConnector dbc;
 
     // Alert Dialog Manager
     AlertDialogManager alert = new AlertDialogManager();
@@ -37,14 +39,6 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try {
-            this.dbc        = new DBConnector();
-        } catch (Exception e) {
-            alert.showAlertDialog(MainActivity.this, "Fehler", e.getLocalizedMessage(), false);
-        }
-
-//        this.oracleCon  = new HTTPConnector();
-
         // Session class instance
         session = new SessionManager(getApplicationContext());
 
@@ -59,6 +53,8 @@ public class MainActivity extends ActionBarActivity {
          * logged in
          * */
         session.checkLogin();
+
+        this.dbc = new DBConnector(this);
 
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
