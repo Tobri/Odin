@@ -1,5 +1,6 @@
 package com.tobri.first;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -32,7 +33,7 @@ public class MainActivity extends ActionBarActivity {
     SessionManager session;
 
     // Button Logout
-    Button btnLogout;
+    MenuItem btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +44,6 @@ public class MainActivity extends ActionBarActivity {
         session = new SessionManager(getApplicationContext());
 
         TextView lblName = (TextView) findViewById(R.id.lblName);
-
-        // Button logout
-        btnLogout = (Button) findViewById(R.id.btnLogout);
 
         /**
          * Call this function whenever you want to check user login
@@ -64,27 +62,11 @@ public class MainActivity extends ActionBarActivity {
 
         // displaying user data
         lblName.setText(Html.fromHtml("Name: <b>" + name + "</b>"));
-
-        /**
-         * Logout button click event
-         * */
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                // Clear the session data
-                // This will clear all session data and
-                // redirect user to LoginActivity
-                session.logoutUser();
-            }
-        });
-
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -98,7 +80,11 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_logout) {
+            session.logoutUser();
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

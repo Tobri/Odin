@@ -81,9 +81,10 @@ public class DBConnector extends SQLiteOpenHelper {
     Message getMessage(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_MESSAGES, new String[] { KEY_ID,
-                KEY_SENDER, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL }, KEY_ID + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
+        Cursor cursor = db.query(TABLE_MESSAGES,
+                new String[] { KEY_ID, KEY_SENDER, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL },
+                KEY_ID + "=?", new String[] { String.valueOf(id) }, null, null, null, null);
+
         if (cursor != null)
             cursor.moveToFirst();
 
@@ -101,7 +102,7 @@ public class DBConnector extends SQLiteOpenHelper {
     public List<Message> getAllMessages() {
         List<Message> messageList = new ArrayList<Message>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_MESSAGES;
+        String selectQuery = "SELECT * FROM " + TABLE_MESSAGES;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -122,6 +123,52 @@ public class DBConnector extends SQLiteOpenHelper {
 
         // return message list
         return messageList;
+    }
+
+    // Getting All Messages From Specific Sender
+    public List<Message> getAllMessages(String sender) {
+        List<Message> messageList = new ArrayList<Message>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
+                + " WHERE " + KEY_SENDER + " LIKE '" + sender + "'";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Message message = new Message();
+                message.setId(Integer.parseInt(cursor.getString(0)));
+                message.setSender(cursor.getString(1));
+                message.setReceived(cursor.getString(2));
+                message.setMessage(cursor.getString(3));
+                message.setAdditional(cursor.getString(4));
+                // Adding message to list
+                messageList.add(message);
+            } while (cursor.moveToNext());
+        }
+
+        // return message list
+        return messageList;
+    }
+
+    // Getting All Senders
+    public List<String> getAllSenders() {
+        List<String> senderList = new ArrayList<String>();
+        String selectQuery = "SELECT DISTINCT '" + KEY_SENDER
+                + "' FROM " + TABLE_MESSAGES;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                senderList.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+
+        return senderList;
     }
 
     // Updating single message
@@ -147,7 +194,6 @@ public class DBConnector extends SQLiteOpenHelper {
         db.close();
     }
 
-
     // Getting messages Count
     public int getMessagesCount() {
         String countQuery = "SELECT  * FROM " + TABLE_MESSAGES;
@@ -158,4 +204,5 @@ public class DBConnector extends SQLiteOpenHelper {
         // return count
         return cursor.getCount();
     }
+
 }
