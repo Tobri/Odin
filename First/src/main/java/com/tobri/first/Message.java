@@ -7,21 +7,24 @@ package com.tobri.first;
 public class Message {
     protected Integer   id;
     protected String    sender;
+    protected String    receiver;
     protected String    received;
     protected String    message;
     protected String    additional;
 
     public Message() { }
 
-    public Message(Integer id, String sender, String received, String message) {
+    public Message(Integer id, String sender, String receiver, String received, String message) {
         this.sender     = sender;
+        this.receiver   = receiver;
         this.received   = received;
         this.message    = message;
         this.additional = null;
     }
 
-    public Message(Integer id, String sender, String received, String message, String additional) {
+    public Message(Integer id, String sender, String receiver, String received, String message, String additional) {
         this.sender     = sender;
+        this.receiver   = receiver;
         this.received   = received;
         this.message    = message;
         this.additional = additional;
@@ -49,6 +52,14 @@ public class Message {
 
     public void setSender(String sender) {
         this.sender = sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 
     public String getReceived() {

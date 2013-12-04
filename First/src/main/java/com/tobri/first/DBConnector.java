@@ -28,6 +28,7 @@ public class DBConnector extends SQLiteOpenHelper {
     // Messages Table Columns names
     private static final String KEY_ID              = "id";
     private static final String KEY_SENDER          = "name";
+    private static final String KEY_RCVR            = "receiver";
     private static final String KEY_RCVD            = "received";
     private static final String KEY_TEXT            = "text";
     private static final String KEY_ADDITIONAL      = "additional";
@@ -42,6 +43,7 @@ public class DBConnector extends SQLiteOpenHelper {
                 "CREATE TABLE " + TABLE_MESSAGES + "("
                 + KEY_ID         + " INTEGER PRIMARY KEY,"
                 + KEY_SENDER     + " TEXT,"
+                + KEY_RCVR       + " TEXT,"
                 + KEY_RCVD       + " TEXT,"
                 + KEY_TEXT       + " TEXT,"
                 + KEY_ADDITIONAL + " TEXT"
@@ -68,6 +70,7 @@ public class DBConnector extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_SENDER, message.getSender());
+        values.put(KEY_RCVR, message.getReceiver());
         values.put(KEY_RCVD, message.getReceived());
         values.put(KEY_TEXT, message.getMessage());
         values.put(KEY_ADDITIONAL, message.getAdditional());
@@ -82,7 +85,7 @@ public class DBConnector extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_MESSAGES,
-                new String[] { KEY_ID, KEY_SENDER, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL },
+                new String[] { KEY_ID, KEY_SENDER, KEY_RCVR, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL },
                 KEY_ID + "=?", new String[] { String.valueOf(id) }, null, null, null, null);
 
         if (cursor != null)
@@ -93,7 +96,8 @@ public class DBConnector extends SQLiteOpenHelper {
                 cursor.getString(1),
                 cursor.getString(2),
                 cursor.getString(3),
-                cursor.getString(4));
+                cursor.getString(4),
+                cursor.getString(5));
         // return message
         return message;
     }
@@ -113,9 +117,10 @@ public class DBConnector extends SQLiteOpenHelper {
                 Message message = new Message();
                 message.setId(Integer.parseInt(cursor.getString(0)));
                 message.setSender(cursor.getString(1));
-                message.setReceived(cursor.getString(2));
-                message.setMessage(cursor.getString(3));
-                message.setAdditional(cursor.getString(4));
+                message.setReceiver(cursor.getString(2));
+                message.setReceived(cursor.getString(3));
+                message.setMessage(cursor.getString(4));
+                message.setAdditional(cursor.getString(5));
                 // Adding message to list
                 messageList.add(message);
             } while (cursor.moveToNext());
@@ -141,9 +146,10 @@ public class DBConnector extends SQLiteOpenHelper {
                 Message message = new Message();
                 message.setId(Integer.parseInt(cursor.getString(0)));
                 message.setSender(cursor.getString(1));
-                message.setReceived(cursor.getString(2));
-                message.setMessage(cursor.getString(3));
-                message.setAdditional(cursor.getString(4));
+                message.setReceiver(cursor.getString(2));
+                message.setReceived(cursor.getString(3));
+                message.setMessage(cursor.getString(4));
+                message.setAdditional(cursor.getString(5));
                 // Adding message to list
                 messageList.add(message);
             } while (cursor.moveToNext());
@@ -177,6 +183,7 @@ public class DBConnector extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_SENDER, message.getSender());
+        values.put(KEY_RCVR, message.getReceiver());
         values.put(KEY_RCVD, message.getReceived());
         values.put(KEY_TEXT, message.getMessage());
         values.put(KEY_ADDITIONAL, message.getAdditional());
