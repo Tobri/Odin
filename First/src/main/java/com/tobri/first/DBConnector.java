@@ -167,8 +167,8 @@ public class DBConnector extends SQLiteOpenHelper {
     // Getting All Senders
     public List<String> getAllSenders() {
         List<String> senderList = new ArrayList<String>();
-        String selectQuery = "SELECT DISTINCT '" + KEY_SENDER
-                + "' FROM " + TABLE_MESSAGES;
+        String selectQuery = "SELECT DISTINCT " + KEY_SENDER
+                + " FROM " + TABLE_MESSAGES;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

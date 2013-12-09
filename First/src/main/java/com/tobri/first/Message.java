@@ -35,7 +35,7 @@ public class Message {
         this.receiver   = receiver;
         this.received   = received;
         this.message    = message;
-        this.additional = null;
+        this.additional = new JSONArray();
     }
 
     public Message(Integer id, String sender, String receiver, String received, String message, JSONArray additional) {

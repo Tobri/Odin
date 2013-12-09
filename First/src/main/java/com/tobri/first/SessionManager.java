@@ -20,6 +20,9 @@ public class SessionManager {
     // Shared pref mode
     int PRIVATE_MODE = 0;
 
+    // TODO: Adresse anpassen
+    private static final String URL_LOGIN = "http://iwap3.informatik.htw-dresden.de/oracle/";
+
     // Sharedpref file name
     private static final String PREF_NAME = "ToBriPref";
 
@@ -28,6 +31,8 @@ public class SessionManager {
 
     // User name (make variable public to access from outside)
     public static final String KEY_NAME = "name";
+    // Current Senders Hash
+    public static final String KEY_HASH = "hash";
 
     // Constructor
     public SessionManager(Context context){
@@ -39,12 +44,15 @@ public class SessionManager {
     /**
      * Create login session
      * */
-    public void createLoginSession(String name){
+    public void createLoginSession(String name, String hash){
         // Storing login value as TRUE
         editor.putBoolean(IS_LOGIN, true);
 
         // Storing name in pref
         editor.putString(KEY_NAME, name);
+
+        // Storing hash in pref
+        editor.putString(KEY_HASH, hash);
 
         // commit changes
         editor.commit();
@@ -55,7 +63,7 @@ public class SessionManager {
      * If false it will redirect user to login page
      * Else won't do anything
      * */
-    public void checkLogin(){
+    public void checkLogin() {
         // Check login status
         if(!this.isLoggedIn()){
             // user is not logged in redirect him to Login Activity
@@ -73,8 +81,10 @@ public class SessionManager {
     }
 
     public boolean loginUser(String username, String password) {
+        HTTPConnector httpConnector = new HTTPConnector(URL_LOGIN);
         // ToDo: Daten über HTTP mit Oracle
-        this.createLoginSession(username);
+        String currentHash = httpConnector.login(username, password);
+        this.createLoginSession(username, currentHash);
         return true;
     }
 
@@ -85,6 +95,7 @@ public class SessionManager {
         HashMap<String, String> user = new HashMap<String, String>();
         // user name
         user.put(KEY_NAME, pref.getString(KEY_NAME, null));
+        user.put(KEY_HASH, pref.getString(KEY_HASH, null));
 
         // return user
         return user;
