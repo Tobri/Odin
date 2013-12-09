@@ -13,6 +13,7 @@ import android.database.sqlite.*;
 
 /**
  * Created by studat on 27.11.13.
+ * Hinweis: muss von SQLiteOpenHelper abgeleitet werden, sonst Fehler beim Öffnen der Datenbank
  */
 public class DBConnector extends SQLiteOpenHelper {
     // All Static variables
@@ -23,7 +24,7 @@ public class DBConnector extends SQLiteOpenHelper {
     private static final String DATABASE_NAME       = "messagesManager";
 
     // Messages table name
-    private static final String TABLE_MESSAGES = "messages";
+    private static final String TABLE_MESSAGES      = "messages";
 
     // Messages Table Columns names
     private static final String KEY_ID              = "id";

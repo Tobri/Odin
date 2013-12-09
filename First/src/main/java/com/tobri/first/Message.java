@@ -1,20 +1,36 @@
 package com.tobri.first;
 
 
+import android.content.Context;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by studat on 02.12.13.
  */
 public class Message {
+    private static String TAG_MASSAGES      = "masseges";
+    private static String TAG_ID            = "id";
+    private static String TAG_SENDER        = "sender";
+    private static String TAG_RECEIVER      = "receiver";
+    private static String TAG_RECEIVED      = "received";
+    private static String TAG_MASSAGE       = "massage";
+    private static String TAG_ADDITIONAL    = "additional";
+
     protected Integer   id;
     protected String    sender;
     protected String    receiver;
     protected String    received;
     protected String    message;
-    protected String    additional;
+    protected JSONArray additional;
 
     public Message() { }
 
     public Message(Integer id, String sender, String receiver, String received, String message) {
+        this.id         = id;
         this.sender     = sender;
         this.receiver   = receiver;
         this.received   = received;
@@ -22,12 +38,22 @@ public class Message {
         this.additional = null;
     }
 
-    public Message(Integer id, String sender, String receiver, String received, String message, String additional) {
+    public Message(Integer id, String sender, String receiver, String received, String message, JSONArray additional) {
+        this.id         = id;
         this.sender     = sender;
         this.receiver   = receiver;
         this.received   = received;
         this.message    = message;
         this.additional = additional;
+    }
+
+    public Message(JSONObject json) throws JSONException {
+        this.id         = json.getInt(TAG_ID);
+        this.sender     = json.getString(TAG_SENDER);
+        this.receiver   = json.getString(TAG_RECEIVER);
+        this.received   = json.getString(TAG_RECEIVED);
+        this.message    = json.getString(TAG_MASSAGE);
+        this.additional = json.getJSONArray(TAG_ADDITIONAL);
     }
 
     public Integer getId() {
@@ -36,14 +62,6 @@ public class Message {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getAdditional() {
-        return additional;
-    }
-
-    public void setAdditional(String additional) {
-        this.additional = additional;
     }
 
     public String getSender() {
@@ -76,5 +94,26 @@ public class Message {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public JSONArray getAdditional() {
+        return additional;
+    }
+
+    public void setAdditional(JSONArray additional) {
+        this.additional = additional;
+    }
+
+    public JSONObject toJSON() throws JSONException {
+        JSONObject tmp = new JSONObject();
+
+        tmp.put(TAG_ID, this.id);
+        tmp.put(TAG_SENDER, this.sender);
+        tmp.put(TAG_RECEIVER, this.receiver);
+        tmp.put(TAG_RECEIVED, this.received);
+        tmp.put(TAG_MASSAGE, this.message);
+        tmp.put(TAG_ADDITIONAL, this.additional);
+
+        return tmp;
     }
 }
