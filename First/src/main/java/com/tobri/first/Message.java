@@ -29,7 +29,7 @@ public class Message {
 
     public Message() { }
 
-    public Message(Integer id, String sender, String receiver, String received, String message) {
+    public Message(Integer id, String sender, String receiver, String received, String message) throws JSONException {
         this.id         = id;
         this.sender     = sender;
         this.receiver   = receiver;
@@ -38,7 +38,7 @@ public class Message {
         this.additional = new JSONArray();
     }
 
-    public Message(Integer id, String sender, String receiver, String received, String message, JSONArray additional) {
+    public Message(Integer id, String sender, String receiver, String received, String message, JSONArray additional) throws JSONException {
         this.id         = id;
         this.sender     = sender;
         this.receiver   = receiver;
@@ -115,5 +115,10 @@ public class Message {
         tmp.put(TAG_ADDITIONAL, this.additional);
 
         return tmp;
+    }
+
+    @Override
+    public String toString() {
+        return this.getSender() + ": " + this.getMessage();
     }
 }

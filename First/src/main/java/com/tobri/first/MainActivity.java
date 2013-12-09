@@ -1,37 +1,24 @@
 package com.tobri.first;
 
-import android.content.ClipData;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import org.json.JSONException;
+
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
-//    protected HTTPConnector oracleCon;
-//    protected HTTPConnector mongoCon;
-
     // Database Connector
     protected DBConnector dbc;
 
@@ -55,8 +42,8 @@ public class MainActivity extends ActionBarActivity {
             dbc.addMessage(new Message(4, "Sender 3", "ich4", "20110104", "Text 4"));
             dbc.addMessage(new Message(5, "Sender 1", "ich5", "20110105", "Text 5"));
             dbc.addMessage(new Message(6, "Sender 2", "ich6", "20110106", "Text 6"));
-        } catch (Exception e) {
-            alert.showAlertDialog(this, "Fehler 1", e.getLocalizedMessage(), false);
+        } catch (JSONException e) {
+            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
         }
 
         // Session class instance
@@ -69,8 +56,16 @@ public class MainActivity extends ActionBarActivity {
             ListAdapter listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
             lvSenders.setAdapter(listAdapter);
         } catch (Exception e) {
-            alert.showAlertDialog(this, "Fehler 2", e.getLocalizedMessage(), false);
+            alert.showAlertDialog(this, "Fehler 2", e.toString(), false);
         }
+
+        lvSenders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(adapterView.getContext(), ShowMessages.class);
+                adapterView.getContext().startActivity(intent);
+            }
+        });
 
         /**
          * Call this function whenever you want to check user login

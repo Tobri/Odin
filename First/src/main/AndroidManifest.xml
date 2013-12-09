@@ -24,8 +24,16 @@
         </activity>
         <!-- DashBoard / MainActivity -->
         <activity
-            android:name=".LoginActivity"
+            android:name="com.tobri.first.LoginActivity"
             android:label="User Login" >
+        </activity>
+        <activity
+            android:name="com.tobri.first.showMassages"
+            android:label="@string/title_activity_show_massages" >
+        </activity>
+        <activity
+            android:name="com.tobri.first.ShowMessages"
+            android:label="@string/title_activity_show_messages" >
         </activity>
     </application>
 

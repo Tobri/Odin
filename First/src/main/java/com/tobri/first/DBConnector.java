@@ -140,7 +140,8 @@ public class DBConnector extends SQLiteOpenHelper {
         List<Message> messageList = new ArrayList<Message>();
         // Select All Query
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
-                + " WHERE " + KEY_SENDER + " LIKE '" + sender + "'";
+                + " WHERE " + KEY_SENDER + " LIKE '" + sender + "'"
+                + " OR " + KEY_RCVR + " LIKE '" + sender + "'";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
