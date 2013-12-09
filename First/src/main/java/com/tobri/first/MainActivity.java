@@ -32,6 +32,19 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        session.checkLogin();
+
+        TextView lblName    = (TextView) findViewById(R.id.lblName);
+        ListView lvSenders  = (ListView) findViewById(R.id.lvSenders);
+
+        // get user data from session
+        HashMap<String, String> user = session.getUserDetails();
+
+        // name
+        String name = user.get(SessionManager.KEY_NAME);
+
+        // displaying user data
+        lblName.setText(Html.fromHtml("Name: <b>" + name + "</b>"));
 
         this.dbc = new DBConnector(this);
 
@@ -49,8 +62,6 @@ public class MainActivity extends ActionBarActivity {
         // Session class instance
         session = new SessionManager(getApplicationContext());
 
-        TextView lblName    = (TextView) findViewById(R.id.lblName);
-        ListView lvSenders  = (ListView) findViewById(R.id.lvSenders);
 
         try {
             ListAdapter listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
@@ -67,23 +78,6 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        /**
-         * Call this function whenever you want to check user login
-         * This will redirect user to LoginActivity is he is not
-         * logged in
-         * */
-        session.checkLogin();
-
-        this.dbc = new DBConnector(this);
-
-        // get user data from session
-        HashMap<String, String> user = session.getUserDetails();
-
-        // name
-        String name = user.get(SessionManager.KEY_NAME);
-
-        // displaying user data
-        lblName.setText(Html.fromHtml("Name: <b>" + name + "</b>"));
     }
 
 
