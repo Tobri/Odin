@@ -11,6 +11,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 /**
  * Created by studat on 27.11.13.
  * Hinweis: muss von SQLiteOpenHelper abgeleitet werden, sonst Fehler beim Öffnen der Datenbank
@@ -74,7 +77,7 @@ public class DBConnector extends SQLiteOpenHelper {
         values.put(KEY_RCVR, message.getReceiver());
         values.put(KEY_RCVD, message.getReceived());
         values.put(KEY_TEXT, message.getMessage());
-        values.put(KEY_ADDITIONAL, message.getAdditional());
+        values.put(KEY_ADDITIONAL, message.getAdditional().toString());
 
         // Inserting Row
         db.insert(TABLE_MESSAGES, null, values);
@@ -82,7 +85,7 @@ public class DBConnector extends SQLiteOpenHelper {
     }
 
     // Getting single message
-    Message getMessage(int id) {
+    Message getMessage(int id) throws JSONException {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_MESSAGES,
@@ -98,13 +101,14 @@ public class DBConnector extends SQLiteOpenHelper {
                 cursor.getString(2),
                 cursor.getString(3),
                 cursor.getString(4),
-                cursor.getString(5));
+                new JSONArray(cursor.getString(5))
+        );
         // return message
         return message;
     }
 
     // Getting All Messages
-    public List<Message> getAllMessages() {
+    public List<Message> getAllMessages() throws JSONException {
         List<Message> messageList = new ArrayList<Message>();
         // Select All Query
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES;
@@ -121,7 +125,7 @@ public class DBConnector extends SQLiteOpenHelper {
                 message.setReceiver(cursor.getString(2));
                 message.setReceived(cursor.getString(3));
                 message.setMessage(cursor.getString(4));
-                message.setAdditional(cursor.getString(5));
+                message.setAdditional(new JSONArray(cursor.getString(5)));
                 // Adding message to list
                 messageList.add(message);
             } while (cursor.moveToNext());
@@ -132,7 +136,7 @@ public class DBConnector extends SQLiteOpenHelper {
     }
 
     // Getting All Messages From Specific Sender
-    public List<Message> getAllMessages(String sender) {
+    public List<Message> getAllMessages(String sender) throws JSONException {
         List<Message> messageList = new ArrayList<Message>();
         // Select All Query
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
@@ -150,7 +154,7 @@ public class DBConnector extends SQLiteOpenHelper {
                 message.setReceiver(cursor.getString(2));
                 message.setReceived(cursor.getString(3));
                 message.setMessage(cursor.getString(4));
-                message.setAdditional(cursor.getString(5));
+                message.setAdditional(new JSONArray(cursor.getString(5)));
                 // Adding message to list
                 messageList.add(message);
             } while (cursor.moveToNext());
@@ -187,7 +191,7 @@ public class DBConnector extends SQLiteOpenHelper {
         values.put(KEY_RCVR, message.getReceiver());
         values.put(KEY_RCVD, message.getReceived());
         values.put(KEY_TEXT, message.getMessage());
-        values.put(KEY_ADDITIONAL, message.getAdditional());
+        values.put(KEY_ADDITIONAL, message.getAdditional().toString());
 
         // updating row
         return db.update(TABLE_MESSAGES, values, KEY_ID + " = ?",
