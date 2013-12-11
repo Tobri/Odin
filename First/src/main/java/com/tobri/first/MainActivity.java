@@ -32,19 +32,21 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        session.checkLogin();
 
         TextView lblName    = (TextView) findViewById(R.id.lblName);
         ListView lvSenders  = (ListView) findViewById(R.id.lvSenders);
 
+        // Session class instance
+        session = new SessionManager(getApplicationContext());
+        session.checkLogin();
+
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
-
         // name
         String name = user.get(SessionManager.KEY_NAME);
-
+        String hash = user.get(SessionManager.KEY_HASH);
         // displaying user data
-        lblName.setText(Html.fromHtml("Name: <b>" + name + "</b>"));
+        lblName.setText(Html.fromHtml("Name: <b>" + name + "</b><br />Hash: " + hash));
 
         this.dbc = new DBConnector(this);
 
@@ -59,8 +61,6 @@ public class MainActivity extends ActionBarActivity {
             alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
         }
 
-        // Session class instance
-        session = new SessionManager(getApplicationContext());
 
 
         try {
