@@ -864,11 +864,11 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f070023;
         public static final int action_bar_title=0x7f070022;
         public static final int action_context_bar=0x7f07001d;
-        public static final int action_logout=0x7f070044;
+        public static final int action_logout=0x7f070045;
         public static final int action_menu_divider=0x7f070015;
         public static final int action_menu_presenter=0x7f070016;
         public static final int action_mode_close_button=0x7f070024;
-        public static final int action_settings=0x7f070043;
+        public static final int action_settings=0x7f070044;
         public static final int activity_chooser_view_content=0x7f070025;
         public static final int always=0x7f07000f;
         public static final int beginning=0x7f07000a;
@@ -890,9 +890,10 @@ containing a value of this type.
         public static final int ifRoom=0x7f07000e;
         public static final int image=0x7f070027;
         public static final int lblName=0x7f07003f;
+        public static final int lblSender=0x7f070042;
         public static final int listMode=0x7f070001;
         public static final int list_item=0x7f070029;
-        public static final int lvMessages=0x7f070042;
+        public static final int lvMessages=0x7f070043;
         public static final int lvSenders=0x7f070040;
         public static final int middle=0x7f07000b;
         public static final int never=0x7f07000d;
@@ -980,9 +981,7 @@ containing a value of this type.
         public static final int action_logout=0x7f0a000d;
         public static final int action_settings=0x7f0a000e;
         public static final int app_name=0x7f0a000f;
-        public static final int hello_world=0x7f0a0010;
-        public static final int title_activity_show_massages=0x7f0a0011;
-        public static final int title_activity_show_messages=0x7f0a0012;
+        public static final int title_activity_show_messages=0x7f0a0010;
     }
     public static final class style {
         /**  Customize your theme here. 

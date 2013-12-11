@@ -33,8 +33,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView lblName    = (TextView) findViewById(R.id.lblName);
-        ListView lvSenders  = (ListView) findViewById(R.id.lvSenders);
+        TextView lblName          = (TextView) findViewById(R.id.lblName);
+        final ListView lvSenders  = (ListView) findViewById(R.id.lvSenders);
 
         // Session class instance
         session = new SessionManager(getApplicationContext());
@@ -74,6 +74,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(adapterView.getContext(), ShowMessages.class);
+                intent.putExtra("sender", lvSenders.getAdapter().getItem(i).toString());
                 adapterView.getContext().startActivity(intent);
             }
         });
