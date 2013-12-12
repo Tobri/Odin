@@ -12,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -73,7 +72,7 @@ public class MainActivity extends ActionBarActivity {
         lvSenders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(adapterView.getContext(), ShowMessages.class);
+                Intent intent = new Intent(adapterView.getContext(), ShowMessagesActivity.class);
                 intent.putExtra("sender", lvSenders.getAdapter().getItem(i).toString());
                 adapterView.getContext().startActivity(intent);
             }

@@ -5,5 +5,8 @@
     <string name="action_settings">Einstellungen</string>
     <string name="action_logout">Logout</string>
     <string name="title_activity_show_messages">Nachrichten anzeigen</string>
+    <string name="title_activity_register">Registrieren</string>
+    <string name="lblUsername">Nutzername:</string>
+    <string name="lblPassword">Passwort:</string>
 
 </resources>

@@ -10,9 +10,9 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:text="Username"
         android:singleLine="true"
-        android:layout_marginBottom="5dip"
-        android:id="@+id/lblUsername" />
+        android:layout_marginBottom="5dip"/>
 
     <EditText android:id="@+id/txtUsername"
         android:layout_width="fill_parent"
@@ -22,8 +22,8 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dip"
-        android:id="@+id/lblPassword" />
+        android:text="Password"
+        android:layout_marginBottom="5dip"/>
 
     <EditText android:id="@+id/txtPassword"
         android:layout_width="fill_parent"
