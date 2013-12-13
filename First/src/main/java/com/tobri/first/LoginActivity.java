@@ -13,7 +13,7 @@ public class LoginActivity extends Activity {
     EditText txtUsername, txtPassword;
 
     // login button
-    Button btnLogin;
+    Button btnLogin, btnRegister;
 
     // Alert Dialog Manager
     AlertDialogManager alert = new AlertDialogManager();
@@ -35,6 +35,7 @@ public class LoginActivity extends Activity {
 
         // Login button
         btnLogin = (Button) findViewById(R.id.btnLogin);
+        btnRegister = (Button) findViewById(R.id.btnRegister);
 
 
         // Login button click event
@@ -64,6 +65,16 @@ public class LoginActivity extends Activity {
                     alert.showAlertDialog(LoginActivity.this, "Login failed..", "Please enter username and password", false);
                 }
 
+            }
+        });
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(i);
+                finish();
             }
         });
     }

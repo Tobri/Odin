@@ -12,9 +12,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity {
@@ -35,6 +38,15 @@ public class MainActivity extends ActionBarActivity {
         TextView lblName          = (TextView) findViewById(R.id.lblName);
         final ListView lvSenders  = (ListView) findViewById(R.id.lvSenders);
 
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("SHA-512");
+//            Toast.makeText(this, "SHA-512 gefunden", Toast.LENGTH_LONG).show();
+//        } catch (NoSuchAlgorithmException nsae) {
+//            Toast.makeText(this, "!SHA-512", Toast.LENGTH_LONG).show();
+//        }
+
+
+
         // Session class instance
         session = new SessionManager(getApplicationContext());
         session.checkLogin();
@@ -49,25 +61,22 @@ public class MainActivity extends ActionBarActivity {
 
         this.dbc = new DBConnector(this);
 
-        try {
-            dbc.addMessage(new Message(1, "Sender 1", "ich1", "20110101", "Text 1"));
-            dbc.addMessage(new Message(2, "Sender 2", "ich2", "20110102", "Text 2"));
-            dbc.addMessage(new Message(3, "Sender 1", "ich3", "20110103", "Text 3"));
-            dbc.addMessage(new Message(4, "Sender 3", "ich4", "20110104", "Text 4"));
-            dbc.addMessage(new Message(5, "Sender 1", "ich5", "20110105", "Text 5"));
-            dbc.addMessage(new Message(6, "Sender 2", "ich6", "20110106", "Text 6"));
-        } catch (JSONException e) {
-            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
-        }
+//        try {
+//            dbc.addMessage(new Message(1, "Sender 1", "ich1", "20110101", "Text 1"));
+//            dbc.addMessage(new Message(2, "Sender 2", "ich2", "20110102", "Text 2"));
+//            dbc.addMessage(new Message(3, "Sender 1", "ich3", "20110103", "Text 3"));
+//            dbc.addMessage(new Message(4, "Sender 3", "ich4", "20110104", "Text 4"));
+//            dbc.addMessage(new Message(5, "Sender 1", "ich5", "20110105", "Text 5"));
+//            dbc.addMessage(new Message(6, "Sender 2", "ich6", "20110106", "Text 6"));
+//        } catch (JSONException e) {
+//            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
+//        }
 
 
 
-        try {
-            ListAdapter listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
-            lvSenders.setAdapter(listAdapter);
-        } catch (Exception e) {
-            alert.showAlertDialog(this, "Fehler 2", e.toString(), false);
-        }
+        ListAdapter listAdapter =
+                new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
+        lvSenders.setAdapter(listAdapter);
 
         lvSenders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

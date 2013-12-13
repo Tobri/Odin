@@ -8,5 +8,13 @@
     <string name="title_activity_register">Registrieren</string>
     <string name="lblUsername">Nutzername:</string>
     <string name="lblPassword">Passwort:</string>
+    <string name="btnLogin">Login</string>
+    <string name="btnRegister">Registrieren</string>
+    <string name="lblFirstname">Vorname:</string>
+    <string name="lblLastname">Nachname:</string>
+    <string name="lblStreet">Straße:</string>
+    <string name="lblZipcode">PLZ:</string>
+    <string name="lblLocation">Ort:</string>
+    <string name="lblEmail">E-Mail:</string>
 
 </resources>

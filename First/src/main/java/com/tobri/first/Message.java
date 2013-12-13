@@ -117,6 +117,10 @@ public class Message {
         return tmp;
     }
 
+    /**
+     * ToDo: Reimplement for final version!
+     * @return
+     */
     @Override
     public String toString() {
         return this.getSender() + ": " + this.getMessage();
