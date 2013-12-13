@@ -33,6 +33,8 @@ public class SessionManager {
     public static final String KEY_NAME = "name";
     // Current Senders Hash
     public static final String KEY_HASH = "hash";
+    // Encrypted Password
+    public static final String KEY_PASS = "pass";
 
     // Constructor
     public SessionManager(Context context){
@@ -44,7 +46,7 @@ public class SessionManager {
     /**
      * Create login session
      * */
-    public void createLoginSession(String name, String hash){
+    public void createLoginSession(String name, String hash, String pass) {
         // Storing login value as TRUE
         editor.putBoolean(IS_LOGIN, true);
 
@@ -53,6 +55,9 @@ public class SessionManager {
 
         // Storing hash in pref
         editor.putString(KEY_HASH, hash);
+
+        // Storing password in pref
+        editor.putString(KEY_PASS, pass);
 
         // commit changes
         editor.commit();
@@ -84,7 +89,7 @@ public class SessionManager {
         HTTPConnector httpConnector = new HTTPConnector(URL_LOGIN);
         // ToDo: Daten über HTTP mit Oracle
         String currentHash = httpConnector.login(username, password);
-        this.createLoginSession(username, currentHash);
+        this.createLoginSession(username, currentHash, password);
         return true;
     }
 
@@ -95,7 +100,10 @@ public class SessionManager {
         HashMap<String, String> user = new HashMap<String, String>();
         // user name
         user.put(KEY_NAME, pref.getString(KEY_NAME, null));
+        // user hash
         user.put(KEY_HASH, pref.getString(KEY_HASH, null));
+        // user password
+        user.put(KEY_PASS, pref.getString(KEY_PASS, null));
 
         // return user
         return user;
@@ -109,11 +117,11 @@ public class SessionManager {
         editor.clear();
         editor.commit();
 
-        // After logout redirect user to Loing Activity
+        // After logout redirect user to Login Activity
         Intent i = new Intent(_context, LoginActivity.class);
+
         // Closing all the Activities
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
         // Add new Flag to start new Activity
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

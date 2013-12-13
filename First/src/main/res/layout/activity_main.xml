@@ -10,7 +10,7 @@
         android:id="@+id/lblName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"
+        android:singleLine="false"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 

@@ -55,9 +55,9 @@ public class MainActivity extends ActionBarActivity {
         HashMap<String, String> user = session.getUserDetails();
         // name
         String name = user.get(SessionManager.KEY_NAME);
-        String hash = user.get(SessionManager.KEY_HASH);
+        String hash = user.get(SessionManager.KEY_PASS);
         // displaying user data
-        lblName.setText(Html.fromHtml("Name: <b>" + name + "</b><br />Hash: " + hash));
+        lblName.setText(Html.fromHtml("PWD: <b>" + hash + "</b>"));
 
         this.dbc = new DBConnector(this);
 
