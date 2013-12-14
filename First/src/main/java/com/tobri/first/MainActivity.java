@@ -1,23 +1,31 @@
 package com.tobri.first;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity {
     // Database Connector
-    protected DBConnector dbc;
+    public static DBConnector dbc;
+
+    // TCP Connector
+    public TCPConnector tcpConnector;
 
     // Alert Dialog Manager
     AlertDialogManager alert = new AlertDialogManager();
@@ -25,13 +33,19 @@ public class MainActivity extends ActionBarActivity {
     // Session Manager Class
     SessionManager session;
 
+    // Activity elements
+    ListView lvSenders;
+    TextView lblName;
+    Button btnReceive;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView lblName = (TextView) findViewById(R.id.lblName);
-        final ListView lvSenders = (ListView) findViewById(R.id.lvSenders);
+        lblName = (TextView) findViewById(R.id.lblName);
+        lvSenders = (ListView) findViewById(R.id.lvSenders);
+        btnReceive = (Button) findViewById(R.id.btnReceive);
 
         // Session class instance
         session = new SessionManager(getApplicationContext());
@@ -46,9 +60,9 @@ public class MainActivity extends ActionBarActivity {
         // password
         String pass = user.get(SessionManager.KEY_PASS);
         // displaying user data
-        lblName.setText("PWD:" + pass);
+        lblName.setText("Name: " + name + "\nHash: " + hash + "\nPass: " + pass);
 
-        this.dbc = new DBConnector(this);
+        dbc = new DBConnector(this);
 
 //        try {
 //            dbc.addMessage(new Message(1, "Sender 1", "ich1", "20110101", "Text 1"));
@@ -60,6 +74,10 @@ public class MainActivity extends ActionBarActivity {
 //        } catch (JSONException e) {
 //            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
 //        }
+
+        this.tcpConnector = new TCPConnector();
+        Thread thread = new Thread(this.tcpConnector);
+        thread.start();
 
         ListAdapter listAdapter =
                 new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
@@ -73,8 +91,25 @@ public class MainActivity extends ActionBarActivity {
                 adapterView.getContext().startActivity(intent);
             }
         });
-    }
 
+        btnReceive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Message tmpMessage;
+                JSONArray messages = tcpConnector.recieveMessages(
+                        session.getUserDetails().get(SessionManager.KEY_HASH));
+
+                try {
+                    for (int i = 0; i < messages.length(); i++) {
+                        tmpMessage = new Message(messages.getJSONObject(i));
+                        dbc.addMessage(tmpMessage);
+                    }
+                } catch (JSONException jsone) {
+                    alert.showAlertDialog(getApplicationContext(), "Fehler", "JSON-Fehler", false);
+                }
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -15,10 +15,16 @@ public class ShowMessagesActivity extends ActionBarActivity {
 
     AlertDialogManager alert = new AlertDialogManager();
 
+    SessionManager session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_messages);
+
+        // Session class instance
+        session = new SessionManager(getApplicationContext());
+        session.checkLogin();
 
         DBConnector dbc = new DBConnector(this);
         TextView lblSender = (TextView) findViewById(R.id.lblSender);
@@ -54,6 +60,9 @@ public class ShowMessagesActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.action_logout) {
+            session.logoutUser();
             return true;
         }
         return super.onOptionsItemSelected(item);

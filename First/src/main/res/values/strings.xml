@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">First</string>
+    <string name="app_name">ToBri</string>
     <string name="action_settings">Einstellungen</string>
     <string name="action_logout">Logout</string>
     <string name="title_activity_show_messages">Nachrichten anzeigen</string>
+    <string name="title_activity_login">Login</string>
     <string name="title_activity_register">Registrieren</string>
     <string name="lblUsername">Nutzername:</string>
     <string name="lblPassword">Passwort:</string>
     <string name="btnLogin">Login</string>
     <string name="btnRegister">Registrieren</string>
+    <string name="btnReceive">Abfragen</string>
     <string name="lblFirstname">Vorname:</string>
     <string name="lblLastname">Nachname:</string>
     <string name="lblStreet">Straße:</string>
