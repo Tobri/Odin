@@ -1,18 +1,16 @@
 package com.tobri.first;
 
-import java.lang.*;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.*;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by studat on 27.11.13.
@@ -21,21 +19,21 @@ import org.json.JSONException;
 public class DBConnector extends SQLiteOpenHelper {
     // All Static variables
     // Database Version
-    private static final int    DATABASE_VERSION    = 1;
+    private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME       = "messagesManager";
+    private static final String DATABASE_NAME = "messagesManager";
 
     // Messages table name
-    private static final String TABLE_MESSAGES      = "messages";
+    private static final String TABLE_MESSAGES = "messages";
 
     // Messages Table Columns names
-    private static final String KEY_ID              = "id";
-    private static final String KEY_SENDER          = "name";
-    private static final String KEY_RCVR            = "receiver";
-    private static final String KEY_RCVD            = "received";
-    private static final String KEY_TEXT            = "text";
-    private static final String KEY_ADDITIONAL      = "additional";
+    private static final String KEY_ID = "id";
+    private static final String KEY_SENDER = "name";
+    private static final String KEY_RCVR = "receiver";
+    private static final String KEY_RCVD = "received";
+    private static final String KEY_TEXT = "text";
+    private static final String KEY_ADDITIONAL = "additional";
 
     public DBConnector(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -45,13 +43,13 @@ public class DBConnector extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_MESSAGES_TABLE =
                 "CREATE TABLE " + TABLE_MESSAGES + "("
-                + KEY_ID         + " INTEGER PRIMARY KEY,"
-                + KEY_SENDER     + " TEXT,"
-                + KEY_RCVR       + " TEXT,"
-                + KEY_RCVD       + " TEXT,"
-                + KEY_TEXT       + " TEXT,"
-                + KEY_ADDITIONAL + " TEXT"
-                + ")";
+                        + KEY_ID + " INTEGER PRIMARY KEY,"
+                        + KEY_SENDER + " TEXT,"
+                        + KEY_RCVR + " TEXT,"
+                        + KEY_RCVD + " TEXT,"
+                        + KEY_TEXT + " TEXT,"
+                        + KEY_ADDITIONAL + " TEXT"
+                        + ")";
         db.execSQL(CREATE_MESSAGES_TABLE);
     }
 
@@ -89,8 +87,8 @@ public class DBConnector extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_MESSAGES,
-                new String[] { KEY_ID, KEY_SENDER, KEY_RCVR, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL },
-                KEY_ID + "=?", new String[] { String.valueOf(id) }, null, null, null, null);
+                new String[]{KEY_ID, KEY_SENDER, KEY_RCVR, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL},
+                KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
 
         if (cursor != null)
             cursor.moveToFirst();
@@ -196,14 +194,14 @@ public class DBConnector extends SQLiteOpenHelper {
 
         // updating row
         return db.update(TABLE_MESSAGES, values, KEY_ID + " = ?",
-                new String[] { String.valueOf(message.getId()) });
+                new String[]{String.valueOf(message.getId())});
     }
 
     // Deleting single message
     public void deleteMessage(Message message) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_MESSAGES, KEY_ID + " = ?",
-                new String[] { String.valueOf(message.getId()) });
+                new String[]{String.valueOf(message.getId())});
         db.close();
     }
 

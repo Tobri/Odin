@@ -1,9 +1,6 @@
 package com.tobri.first;
 
 
-import android.content.Context;
-import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,47 +9,48 @@ import org.json.JSONObject;
  * Created by studat on 02.12.13.
  */
 public class Message {
-    private static String TAG_MASSAGES      = "masseges";
-    private static String TAG_ID            = "id";
-    private static String TAG_SENDER        = "sender";
-    private static String TAG_RECEIVER      = "receiver";
-    private static String TAG_RECEIVED      = "received";
-    private static String TAG_MASSAGE       = "massage";
-    private static String TAG_ADDITIONAL    = "additional";
+    private static String TAG_MASSAGES = "masseges";
+    private static String TAG_ID = "id";
+    private static String TAG_SENDER = "sender";
+    private static String TAG_RECEIVER = "receiver";
+    private static String TAG_RECEIVED = "received";
+    private static String TAG_MASSAGE = "massage";
+    private static String TAG_ADDITIONAL = "additional";
 
-    protected Integer   id;
-    protected String    sender;
-    protected String    receiver;
-    protected String    received;
-    protected String    message;
+    protected Integer id;
+    protected String sender;
+    protected String receiver;
+    protected String received;
+    protected String message;
     protected JSONArray additional;
 
-    public Message() { }
+    public Message() {
+    }
 
     public Message(Integer id, String sender, String receiver, String received, String message) throws JSONException {
-        this.id         = id;
-        this.sender     = sender;
-        this.receiver   = receiver;
-        this.received   = received;
-        this.message    = message;
+        this.id = id;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.received = received;
+        this.message = message;
         this.additional = new JSONArray();
     }
 
     public Message(Integer id, String sender, String receiver, String received, String message, JSONArray additional) throws JSONException {
-        this.id         = id;
-        this.sender     = sender;
-        this.receiver   = receiver;
-        this.received   = received;
-        this.message    = message;
+        this.id = id;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.received = received;
+        this.message = message;
         this.additional = additional;
     }
 
     public Message(JSONObject json) throws JSONException {
-        this.id         = json.getInt(TAG_ID);
-        this.sender     = json.getString(TAG_SENDER);
-        this.receiver   = json.getString(TAG_RECEIVER);
-        this.received   = json.getString(TAG_RECEIVED);
-        this.message    = json.getString(TAG_MASSAGE);
+        this.id = json.getInt(TAG_ID);
+        this.sender = json.getString(TAG_SENDER);
+        this.receiver = json.getString(TAG_RECEIVER);
+        this.received = json.getString(TAG_RECEIVED);
+        this.message = json.getString(TAG_MASSAGE);
         this.additional = json.getJSONArray(TAG_ADDITIONAL);
     }
 
@@ -119,6 +117,7 @@ public class Message {
 
     /**
      * ToDo: Reimplement for final version!
+     *
      * @return
      */
     @Override

@@ -4,9 +4,9 @@ package com.tobri.first;
  * Created by studat on 28.11.13.
  */
 public class HTTPConnector {
-    private static String ACTION_LOGIN   = "login";
-    private static String ACTION_CHECK   = "check";
-    private static String ACTION_SEND    = "send";
+    private static String ACTION_LOGIN = "login";
+    private static String ACTION_CHECK = "check";
+    private static String ACTION_SEND = "send";
     private static String ACTION_RECEIVE = "receive";
 
     protected String url;

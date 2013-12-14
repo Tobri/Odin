@@ -1,8 +1,8 @@
 package com.tobri.first;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,12 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONException;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity {
@@ -35,17 +30,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView lblName          = (TextView) findViewById(R.id.lblName);
-        final ListView lvSenders  = (ListView) findViewById(R.id.lvSenders);
-
-//        try {
-//            MessageDigest md = MessageDigest.getInstance("SHA-512");
-//            Toast.makeText(this, "SHA-512 gefunden", Toast.LENGTH_LONG).show();
-//        } catch (NoSuchAlgorithmException nsae) {
-//            Toast.makeText(this, "!SHA-512", Toast.LENGTH_LONG).show();
-//        }
-
-
+        TextView lblName = (TextView) findViewById(R.id.lblName);
+        final ListView lvSenders = (ListView) findViewById(R.id.lvSenders);
 
         // Session class instance
         session = new SessionManager(getApplicationContext());
@@ -55,9 +41,12 @@ public class MainActivity extends ActionBarActivity {
         HashMap<String, String> user = session.getUserDetails();
         // name
         String name = user.get(SessionManager.KEY_NAME);
-        String hash = user.get(SessionManager.KEY_PASS);
+        // hash
+        String hash = user.get(SessionManager.KEY_HASH);
+        // password
+        String pass = user.get(SessionManager.KEY_PASS);
         // displaying user data
-        lblName.setText(Html.fromHtml("PWD: <b>" + hash + "</b>"));
+        lblName.setText("PWD:" + pass);
 
         this.dbc = new DBConnector(this);
 
@@ -72,8 +61,6 @@ public class MainActivity extends ActionBarActivity {
 //            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
 //        }
 
-
-
         ListAdapter listAdapter =
                 new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
         lvSenders.setAdapter(listAdapter);
@@ -86,7 +73,6 @@ public class MainActivity extends ActionBarActivity {
                 adapterView.getContext().startActivity(intent);
             }
         });
-
     }
 
 
@@ -112,6 +98,4 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
 }

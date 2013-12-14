@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 
@@ -49,14 +48,7 @@ public class LoginActivity extends Activity {
                 String password = txtPassword.getText().toString();
 
                 // Check if username, password is filled
-                if(username.trim().length() > 0 && password.trim().length() > 0) {
-//                    try {
-//                        Crypter c = new Crypter();
-//                        String p = c.cryptPassword(password);
-//                        Toast.makeText(getApplicationContext(), p, Toast.LENGTH_LONG).show();
-//                    } catch (Exception e) {
-//                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-//                    }
+                if (username.trim().length() > 0 && password.trim().length() > 0) {
                     password = new Crypter().cryptPassword(password);
 
                     if (session.loginUser(username, password)) {
@@ -68,12 +60,11 @@ public class LoginActivity extends Activity {
                         // username / password doesn't match
                         alert.showAlertDialog(LoginActivity.this, "Login failed..", "Username/Password is incorrect", false);
                     }
-                }else{
+                } else {
                     // user didn't entered username or password
                     // Show alert asking him to enter the details
                     alert.showAlertDialog(LoginActivity.this, "Login failed..", "Please enter username and password", false);
                 }
-
             }
         });
 

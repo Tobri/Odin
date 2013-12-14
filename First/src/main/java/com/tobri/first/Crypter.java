@@ -14,22 +14,33 @@ public class Crypter {
     public Crypter() {
         try {
             this.messageDigest = MessageDigest.getInstance(ALGORITHM);
-        } catch (NoSuchAlgorithmException nsae) { }
+        } catch (NoSuchAlgorithmException nsae) {
+            nsae.printStackTrace();
+        }
     }
 
     public String cryptPassword(String password) {
-        this.messageDigest.update(password.getBytes(), 0, password.length());
-        String tmp  = toHex(this.messageDigest.digest());
-        String salt = tmp.substring(0, this.messageDigest.getDigestLength() / 2);
-        tmp         = mergeSalt(tmp, salt);
+        /* hash password */
         this.messageDigest.reset();
-        this.messageDigest.update(tmp.getBytes(), 0, tmp.length());
+        this.messageDigest.update(password.getBytes(Charset.forName("UTF-8")), 0, password.length());
+        String tmp = toHex(this.messageDigest.digest());
+
+        /* calculate and hash salt */
+        String salt = tmp.substring(0, this.messageDigest.getDigestLength() / 2);
+        this.messageDigest.reset();
+        this.messageDigest.update(salt.getBytes(Charset.forName("UTF-8")), 0, salt.length());
+        salt = toHex(this.messageDigest.digest());
+
+        /* merge hashes and hash them */
+        tmp = mergeSalt(tmp, salt);
+        this.messageDigest.reset();
+        this.messageDigest.update(tmp.getBytes(Charset.forName("UTF-8")), 0, tmp.length());
 
         /* Overwrite variables */
         tmp = "0000000000000000000000000000000000000000000000000000000000000000" +
-              "0000000000000000000000000000000000000000000000000000000000000000";
+                "0000000000000000000000000000000000000000000000000000000000000000";
         salt = tmp;
-        tmp  = salt;
+        tmp = salt;
 
         return toHex(this.messageDigest.digest());
     }
@@ -37,32 +48,27 @@ public class Crypter {
     private String toHex(byte[] digest) {
         StringBuffer buf = new StringBuffer();
 
-        for (int i = 0; i < digest.length; i++)
-        {
+        for (int i = 0; i < digest.length; i++) {
             int halfbyte = (digest[i] >>> 4) & 0x0F;
             int two_halfs = 0;
-            do
-            {
+            do {
                 if ((0 <= halfbyte) && (halfbyte <= 9))
                     buf.append((char) ('0' + halfbyte));
                 else
                     buf.append((char) ('a' + (halfbyte - 10)));
                 halfbyte = digest[i] & 0x0F;
             }
-            while(two_halfs++ < 1);
+            while (two_halfs++ < 1);
         }
         return buf.toString();
     }
 
     private String mergeSalt(String enc, String salt) {
-        int i;
         StringBuffer sb = new StringBuffer();
 
-        for (i = 0; i < salt.length(); i++) {
+        for (int i = 0; i < salt.length(); i++) {
             sb.append(enc.charAt(i) ^ salt.charAt(i));
         }
-
-        sb.append(enc.substring(i, enc.length()));
 
         return sb.toString();
     }
