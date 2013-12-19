@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -123,7 +124,9 @@ public class DBConnector extends SQLiteOpenHelper {
                 message.setReceiver(cursor.getString(2));
                 message.setReceived(cursor.getString(3));
                 message.setMessage(cursor.getString(4));
+                Log.e("Message: ", cursor.getString(5));
                 message.setAdditional(new JSONArray(cursor.getString(5)));
+
                 // Adding message to list
                 messageList.add(message);
             } while (cursor.moveToNext());
@@ -154,10 +157,14 @@ public class DBConnector extends SQLiteOpenHelper {
                 message.setReceived(cursor.getString(3));
                 message.setMessage(cursor.getString(4));
                 message.setAdditional(new JSONArray(cursor.getString(5)));
+
                 // Adding message to list
                 messageList.add(message);
             } while (cursor.moveToNext());
         }
+
+        cursor.close();
+        db.close();
 
         // return message list
         return messageList;
@@ -177,6 +184,9 @@ public class DBConnector extends SQLiteOpenHelper {
                 senderList.add(cursor.getString(0));
             } while (cursor.moveToNext());
         }
+
+        cursor.close();
+        db.close();
 
         return senderList;
     }
@@ -211,9 +221,16 @@ public class DBConnector extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.close();
+        db.close();
 
         // return count
         return cursor.getCount();
+    }
+
+    public void dropAll() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_MESSAGES, KEY_ID + " >= ?", new String[]{"1"});
+        db.close();
     }
 
 }

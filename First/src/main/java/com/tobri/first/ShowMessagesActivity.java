@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -39,7 +40,7 @@ public class ShowMessagesActivity extends ActionBarActivity {
             ListAdapter listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllMessages(sender));
             lvMessages.setAdapter(listAdapter);
         } catch (Exception e) {
-            alert.showAlertDialog(this, "Fehler 2", e.toString(), false);
+            Log.e("Exception: ", e.getMessage());
         }
 
     }

@@ -1,9 +1,10 @@
 package com.tobri.first;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,21 +18,35 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity {
     // Database Connector
     public static DBConnector dbc;
 
-    // TCP Connector
-    public TCPConnector tcpConnector;
-
     // Alert Dialog Manager
     AlertDialogManager alert = new AlertDialogManager();
 
     // Session Manager Class
     SessionManager session;
+
+    // Thread
+    Thread thread;
 
     // Activity elements
     ListView lvSenders;
@@ -60,28 +75,23 @@ public class MainActivity extends ActionBarActivity {
         // password
         String pass = user.get(SessionManager.KEY_PASS);
         // displaying user data
-        lblName.setText("Name: " + name + "\nHash: " + hash + "\nPass: " + pass);
+        lblName.setText("Name: " + name);// + "\nHash: " + hash + "\nPass: " + pass);
 
         dbc = new DBConnector(this);
 
-//        try {
-//            dbc.addMessage(new Message(1, "Sender 1", "ich1", "20110101", "Text 1"));
-//            dbc.addMessage(new Message(2, "Sender 2", "ich2", "20110102", "Text 2"));
-//            dbc.addMessage(new Message(3, "Sender 1", "ich3", "20110103", "Text 3"));
-//            dbc.addMessage(new Message(4, "Sender 3", "ich4", "20110104", "Text 4"));
-//            dbc.addMessage(new Message(5, "Sender 1", "ich5", "20110105", "Text 5"));
-//            dbc.addMessage(new Message(6, "Sender 2", "ich6", "20110106", "Text 6"));
-//        } catch (JSONException e) {
-//            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
-//        }
+        try {
+            dbc.dropAll();
+            dbc.addMessage(new Message(1, "Sender 1", "ich1", "20110101", "Text 1"));
+            dbc.addMessage(new Message(2, "Sender 2", "ich2", "20110102", "Text 2"));
+            dbc.addMessage(new Message(3, "Sender 1", "ich3", "20110103", "Text 3"));
+            dbc.addMessage(new Message(4, "Sender 3", "ich4", "20110104", "Text 4"));
+            dbc.addMessage(new Message(5, "Sender 1", "ich5", "20110105", "Text 5"));
+            dbc.addMessage(new Message(6, "Sender 2", "ich6", "20110106", "Text 6"));
+        } catch (JSONException e) {
+            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
+        }
 
-        this.tcpConnector = new TCPConnector();
-        Thread thread = new Thread(this.tcpConnector);
-        thread.start();
-
-        ListAdapter listAdapter =
-                new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
-        lvSenders.setAdapter(listAdapter);
+        updateList();
 
         lvSenders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -95,20 +105,126 @@ public class MainActivity extends ActionBarActivity {
         btnReceive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Message tmpMessage;
-                JSONArray messages = tcpConnector.recieveMessages(
-                        session.getUserDetails().get(SessionManager.KEY_HASH));
-
-                try {
-                    for (int i = 0; i < messages.length(); i++) {
-                        tmpMessage = new Message(messages.getJSONObject(i));
-                        dbc.addMessage(tmpMessage);
-                    }
-                } catch (JSONException jsone) {
-                    alert.showAlertDialog(getApplicationContext(), "Fehler", "JSON-Fehler", false);
+                String params[] = {
+                        TCPConnector.SERVER_GET,
+                        session.getUserDetails().get(SessionManager.KEY_NAME),
+                };
+                TCPConnector tcpConnector = new TCPConnector();
+                if (tcpConnector.getStatus() != AsyncTask.Status.RUNNING) {
+                    tcpConnector.execute(params);
                 }
             }
         });
+    }
+
+    private void updateList() {
+        final ListAdapter listAdapter =
+                new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
+        lvSenders.setAdapter(listAdapter);
+    }
+
+    private class TCPConnector extends AsyncTask<String, Integer, JSONArray> {
+        protected Socket                socket;
+        protected PrintWriter           out;
+        protected BufferedReader        in;
+        protected static final String   SERVER_IP   = "141.56.133.103";
+        protected static final int      SERVER_PORT = 8010;
+
+        public static final String      SERVER_GET  = "get";
+        public static final String      SERVER_SET  = "set";
+        public static final String      SERVER_REM  = "rem";
+
+        public JSONArray receiveMessages(String name) {
+            String tmp = SERVER_GET + " " + name;
+
+            try {
+                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                out.print(tmp);
+                out.flush();
+                in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                return new JSONArray(in.toString());
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            } catch (JSONException jsone) {
+                jsone.printStackTrace();
+            }
+            return null;
+        }
+
+        public void sendMessage(Message message) {
+            try {
+                String tmp = SERVER_SET + " " + message.toJSON();
+            } catch (JSONException jsone) {
+
+            }
+        }
+
+        @Override
+        protected JSONArray doInBackground(String... strings) {
+            JSONArray result = null;
+
+            try {
+                InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
+                this.socket = new Socket(serverAddress, SERVER_PORT);
+                this.socket.setSoTimeout(600);
+                this.socket.setSoLinger(true, 600);
+                this.socket.setKeepAlive(false);
+                this.socket.setReceiveBufferSize(4096);
+            } catch (UnknownHostException uhe) {
+                Log.e("UHE: ", uhe.getMessage());
+            } catch (IOException ioe) {
+                Log.e("IOE: ", ioe.getMessage());
+            } catch (NullPointerException npe) {
+                Log.e("NPE: ", npe.getMessage());
+            }
+
+//            if (SERVER_GET == strings[0]) {
+//                result = receiveMessages(strings[1]);
+//            }
+
+            String tmp = strings[0] + " " + strings[1];
+            try {
+                char buffer[] = new char[4096];
+                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                out.write(tmp);
+                out.flush();
+
+                in.read(buffer, 0, 4096);
+                result = new JSONArray(new String(buffer));
+                Log.e("Nachricht: ", result.getJSONObject(0).toString());
+                socket.close();
+            } catch (IOException ioe) {
+                Log.e("IOE: ", ioe.getMessage());
+            } catch (JSONException jsone) {
+                Log.e("IOE: ", jsone.getMessage());
+            } catch (NullPointerException npe) {
+                Log.e("NPE: ", npe.getMessage());
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray messages) {
+            //super.onPostExecute(messages);
+            Message tmpMessage;
+            JSONObject message;
+
+            try {
+                for (int i = 0; i < messages.length(); i++) {
+                    message    = messages.getJSONObject(i);
+                    tmpMessage = new Message(message);
+                    Log.e("Sender (" + i + "): ", tmpMessage.toString());
+                    dbc.addMessage(tmpMessage);
+                }
+            } catch (JSONException jsone) {
+                Log.e("Main: ", jsone.getMessage());
+            }
+
+            updateList();
+        }
     }
 
     @Override

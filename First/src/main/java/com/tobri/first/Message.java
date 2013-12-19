@@ -1,6 +1,8 @@
 package com.tobri.first;
 
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,12 +11,11 @@ import org.json.JSONObject;
  * Created by studat on 02.12.13.
  */
 public class Message {
-    private static String TAG_MASSAGES = "masseges";
-    private static String TAG_ID = "id";
-    private static String TAG_SENDER = "sender";
-    private static String TAG_RECEIVER = "receiver";
-    private static String TAG_RECEIVED = "received";
-    private static String TAG_MASSAGE = "massage";
+    private static String TAG_ID         = "id";
+    private static String TAG_SENDER     = "sender";
+    private static String TAG_RECEIVER   = "receiver";
+    private static String TAG_RECEIVED   = "received";
+    private static String TAG_MESSAGE    = "message";
     private static String TAG_ADDITIONAL = "additional";
 
     protected Integer id;
@@ -46,12 +47,16 @@ public class Message {
     }
 
     public Message(JSONObject json) throws JSONException {
-        this.id = json.getInt(TAG_ID);
+        //this.id = json.getInt(TAG_ID);
         this.sender = json.getString(TAG_SENDER);
         this.receiver = json.getString(TAG_RECEIVER);
         this.received = json.getString(TAG_RECEIVED);
-        this.message = json.getString(TAG_MASSAGE);
-        this.additional = json.getJSONArray(TAG_ADDITIONAL);
+        this.message = json.getString(TAG_MESSAGE);
+        if (!json.isNull(TAG_ADDITIONAL)) {
+            this.additional = json.getJSONArray(TAG_ADDITIONAL);
+        } else {
+            this.additional = new JSONArray();
+        }
     }
 
     public Integer getId() {
@@ -109,7 +114,7 @@ public class Message {
         tmp.put(TAG_SENDER, this.sender);
         tmp.put(TAG_RECEIVER, this.receiver);
         tmp.put(TAG_RECEIVED, this.received);
-        tmp.put(TAG_MASSAGE, this.message);
+        tmp.put(TAG_MESSAGE, this.message);
         tmp.put(TAG_ADDITIONAL, this.additional);
 
         return tmp;
