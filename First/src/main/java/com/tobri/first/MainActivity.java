@@ -79,17 +79,17 @@ public class MainActivity extends ActionBarActivity {
 
         dbc = new DBConnector(this);
 
-        try {
-            dbc.dropAll();
-            dbc.addMessage(new Message(1, "Sender 1", "ich1", "20110101", "Text 1"));
-            dbc.addMessage(new Message(2, "Sender 2", "ich2", "20110102", "Text 2"));
-            dbc.addMessage(new Message(3, "Sender 1", "ich3", "20110103", "Text 3"));
-            dbc.addMessage(new Message(4, "Sender 3", "ich4", "20110104", "Text 4"));
-            dbc.addMessage(new Message(5, "Sender 1", "ich5", "20110105", "Text 5"));
-            dbc.addMessage(new Message(6, "Sender 2", "ich6", "20110106", "Text 6"));
-        } catch (JSONException e) {
-            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
-        }
+//        try {
+//            dbc.dropAll();
+//            dbc.addMessage(new Message(1, "Sender 1", "ich1", "20110101", "Text 1"));
+//            dbc.addMessage(new Message(2, "Sender 2", "ich2", "20110102", "Text 2"));
+//            dbc.addMessage(new Message(3, "Sender 1", "ich3", "20110103", "Text 3"));
+//            dbc.addMessage(new Message(4, "Sender 3", "ich4", "20110104", "Text 4"));
+//            dbc.addMessage(new Message(5, "Sender 1", "ich5", "20110105", "Text 5"));
+//            dbc.addMessage(new Message(6, "Sender 2", "ich6", "20110106", "Text 6"));
+//        } catch (JSONException e) {
+//            alert.showAlertDialog(this, "Fehler 1", e.toString(), false);
+//        }
 
         updateList();
 
@@ -134,42 +134,17 @@ public class MainActivity extends ActionBarActivity {
         public static final String      SERVER_SET  = "set";
         public static final String      SERVER_REM  = "rem";
 
-        public JSONArray receiveMessages(String name) {
-            String tmp = SERVER_GET + " " + name;
-
-            try {
-                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                out.print(tmp);
-                out.flush();
-                in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                return new JSONArray(in.toString());
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } catch (JSONException jsone) {
-                jsone.printStackTrace();
-            }
-            return null;
-        }
-
-        public void sendMessage(Message message) {
-            try {
-                String tmp = SERVER_SET + " " + message.toJSON();
-            } catch (JSONException jsone) {
-
-            }
-        }
-
         @Override
         protected JSONArray doInBackground(String... strings) {
             JSONArray result = null;
 
             try {
                 InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
-                this.socket = new Socket(serverAddress, SERVER_PORT);
-                this.socket.setSoTimeout(600);
-                this.socket.setSoLinger(true, 600);
-                this.socket.setKeepAlive(false);
-                this.socket.setReceiveBufferSize(4096);
+                socket = new Socket(serverAddress, SERVER_PORT);
+                socket.setSoTimeout(600);
+                socket.setSoLinger(true, 600);
+                socket.setKeepAlive(false);
+                socket.setReceiveBufferSize(4096);
             } catch (UnknownHostException uhe) {
                 Log.e("UHE: ", uhe.getMessage());
             } catch (IOException ioe) {
@@ -177,10 +152,6 @@ public class MainActivity extends ActionBarActivity {
             } catch (NullPointerException npe) {
                 Log.e("NPE: ", npe.getMessage());
             }
-
-//            if (SERVER_GET == strings[0]) {
-//                result = receiveMessages(strings[1]);
-//            }
 
             String tmp = strings[0] + " " + strings[1];
             try {

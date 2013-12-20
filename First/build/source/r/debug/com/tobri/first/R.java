@@ -864,17 +864,18 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f070023;
         public static final int action_bar_title=0x7f070022;
         public static final int action_context_bar=0x7f07001d;
-        public static final int action_logout=0x7f07004f;
+        public static final int action_logout=0x7f070051;
         public static final int action_menu_divider=0x7f070015;
         public static final int action_menu_presenter=0x7f070016;
         public static final int action_mode_close_button=0x7f070024;
-        public static final int action_settings=0x7f07004e;
+        public static final int action_settings=0x7f070050;
         public static final int activity_chooser_view_content=0x7f070025;
         public static final int always=0x7f07000f;
         public static final int beginning=0x7f07000a;
         public static final int btnLogin=0x7f070040;
         public static final int btnReceive=0x7f070044;
         public static final int btnRegister=0x7f070041;
+        public static final int btnSend=0x7f07004f;
         public static final int checkbox=0x7f07002d;
         public static final int collapseActionView=0x7f070011;
         public static final int container=0x7f07004b;
@@ -927,6 +928,7 @@ containing a value of this type.
         public static final int top_action_bar=0x7f070020;
         public static final int txtEmail=0x7f07004a;
         public static final int txtFirstname=0x7f070045;
+        public static final int txtInput=0x7f07004e;
         public static final int txtLastname=0x7f070046;
         public static final int txtLocation=0x7f070049;
         public static final int txtPassword=0x7f07003f;
@@ -995,17 +997,18 @@ containing a value of this type.
         public static final int btnLogin=0x7f0a0010;
         public static final int btnReceive=0x7f0a0011;
         public static final int btnRegister=0x7f0a0012;
-        public static final int lblEmail=0x7f0a0013;
-        public static final int lblFirstname=0x7f0a0014;
-        public static final int lblLastname=0x7f0a0015;
-        public static final int lblLocation=0x7f0a0016;
-        public static final int lblPassword=0x7f0a0017;
-        public static final int lblStreet=0x7f0a0018;
-        public static final int lblUsername=0x7f0a0019;
-        public static final int lblZipcode=0x7f0a001a;
-        public static final int title_activity_login=0x7f0a001b;
-        public static final int title_activity_register=0x7f0a001c;
-        public static final int title_activity_show_messages=0x7f0a001d;
+        public static final int btnSend=0x7f0a0013;
+        public static final int lblEmail=0x7f0a0014;
+        public static final int lblFirstname=0x7f0a0015;
+        public static final int lblLastname=0x7f0a0016;
+        public static final int lblLocation=0x7f0a0017;
+        public static final int lblPassword=0x7f0a0018;
+        public static final int lblStreet=0x7f0a0019;
+        public static final int lblUsername=0x7f0a001a;
+        public static final int lblZipcode=0x7f0a001b;
+        public static final int title_activity_login=0x7f0a001c;
+        public static final int title_activity_register=0x7f0a001d;
+        public static final int title_activity_show_messages=0x7f0a001e;
     }
     public static final class style {
         /**  Customize your theme here. 
