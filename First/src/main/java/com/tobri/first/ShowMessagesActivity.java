@@ -1,5 +1,6 @@
 package com.tobri.first;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,6 +44,8 @@ public class ShowMessagesActivity extends ActionBarActivity {
     protected ListView lvMessages;
     protected EditText txtInput;
     protected Button btnSend;
+
+    protected ProgressDialog pDialog;
 
     String sender;
 
@@ -114,6 +117,16 @@ public class ShowMessagesActivity extends ActionBarActivity {
         public static final String      SERVER_REM  = "rem";
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(ShowMessagesActivity.this);
+            pDialog.setMessage("Sending Message...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
         protected JSONObject doInBackground(String... strings) {
             JSONObject result = null;
 
@@ -158,7 +171,7 @@ public class ShowMessagesActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(JSONObject message) {
-            //super.onPostExecute(messages);
+            super.onPostExecute(message);
 
             try {
                 dbc.addMessage(new Message(message));
@@ -167,6 +180,7 @@ public class ShowMessagesActivity extends ActionBarActivity {
             }
             txtInput.setText("");
             updateList(sender);
+            pDialog.dismiss();
         }
     }
 

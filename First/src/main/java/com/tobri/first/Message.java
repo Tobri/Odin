@@ -11,12 +11,12 @@ import org.json.JSONObject;
  * Created by studat on 02.12.13.
  */
 public class Message {
-    private static String TAG_ID         = "id";
-    private static String TAG_SENDER     = "sender";
-    private static String TAG_RECEIVER   = "receiver";
-    private static String TAG_RECEIVED   = "received";
-    private static String TAG_MESSAGE    = "message";
-    private static String TAG_ADDITIONAL = "additional";
+    static String TAG_ID         = "id";
+    static String TAG_SENDER     = "sender";
+    static String TAG_RECEIVER   = "receiver";
+    static String TAG_RECEIVED   = "received";
+    static String TAG_MESSAGE    = "message";
+    static String TAG_ADDITIONAL = "additional";
 
     protected Integer id;
     protected String sender;
@@ -47,7 +47,9 @@ public class Message {
     }
 
     public Message(JSONObject json) throws JSONException {
-        //this.id = json.getInt(TAG_ID);
+        if (!json.isNull(TAG_ID)) {
+            this.id = json.getInt(TAG_ID);
+        }
         this.sender = json.getString(TAG_SENDER);
         this.receiver = json.getString(TAG_RECEIVER);
         this.received = json.getString(TAG_RECEIVED);

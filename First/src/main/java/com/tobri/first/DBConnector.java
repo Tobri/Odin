@@ -68,7 +68,8 @@ public class DBConnector extends SQLiteOpenHelper {
      */
 
     // Adding new message
-    void addMessage(Message message) {
+    long addMessage(Message message) {
+        long ret = 0;
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -79,8 +80,9 @@ public class DBConnector extends SQLiteOpenHelper {
         values.put(KEY_ADDITIONAL, message.getAdditional().toString());
 
         // Inserting Row
-        db.insert(TABLE_MESSAGES, null, values);
+        ret = db.insert(TABLE_MESSAGES, null, values);
         db.close(); // Closing database connection
+        return ret;
     }
 
     // Getting single message
@@ -171,10 +173,11 @@ public class DBConnector extends SQLiteOpenHelper {
     }
 
     // Getting All Senders
-    public List<String> getAllSenders() {
+    public List<String> getAllSenders(String username) {
         List<String> senderList = new ArrayList<String>();
         String selectQuery = "SELECT DISTINCT " + KEY_SENDER
-                + " FROM " + TABLE_MESSAGES;
+                + " FROM " + TABLE_MESSAGES
+                + " WHERE " + KEY_RCVR + " LIKE \"" + username + "\"";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

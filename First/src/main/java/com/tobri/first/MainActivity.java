@@ -1,5 +1,6 @@
 package com.tobri.first;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,13 +46,13 @@ public class MainActivity extends ActionBarActivity {
     // Session Manager Class
     SessionManager session;
 
-    // Thread
-    Thread thread;
+    private ProgressDialog pDialog;
 
     // Activity elements
     ListView lvSenders;
     TextView lblName;
     Button btnReceive;
+    Button btnNewMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class MainActivity extends ActionBarActivity {
         lblName = (TextView) findViewById(R.id.lblName);
         lvSenders = (ListView) findViewById(R.id.lvSenders);
         btnReceive = (Button) findViewById(R.id.btnReceive);
+        btnNewMessage = (Button) findViewById(R.id.btnNewMessage);
 
         // Session class instance
         session = new SessionManager(getApplicationContext());
@@ -115,11 +117,20 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
+
+        btnNewMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), SendMessage.class);
+                startActivity(i);
+            }
+        });
     }
 
     private void updateList() {
+        String username = session.getUserDetails().get(SessionManager.KEY_NAME);
         final ListAdapter listAdapter =
-                new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders());
+                new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders(username));
         lvSenders.setAdapter(listAdapter);
     }
 
@@ -133,6 +144,16 @@ public class MainActivity extends ActionBarActivity {
         public static final String      SERVER_GET  = "get";
         public static final String      SERVER_SET  = "set";
         public static final String      SERVER_REM  = "rem";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Fetching Messages...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
 
         @Override
         protected JSONArray doInBackground(String... strings) {
@@ -151,9 +172,12 @@ public class MainActivity extends ActionBarActivity {
                 Log.e("IOE: ", ioe.getMessage());
             } catch (NullPointerException npe) {
                 Log.e("NPE: ", npe.getMessage());
+            } catch (Exception e) {
+                Log.e("E: ", e.getMessage());
             }
 
             String tmp = strings[0] + " " + strings[1];
+
             try {
                 char buffer[] = new char[4096];
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
@@ -169,9 +193,11 @@ public class MainActivity extends ActionBarActivity {
             } catch (IOException ioe) {
                 Log.e("IOE: ", ioe.getMessage());
             } catch (JSONException jsone) {
-                Log.e("IOE: ", jsone.getMessage());
+                Log.e("JSONE: ", jsone.getMessage());
             } catch (NullPointerException npe) {
                 Log.e("NPE: ", npe.getMessage());
+            } catch (Exception e) {
+                Log.e("E: ", e.getMessage());
             }
 
             return result;
@@ -179,9 +205,11 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(JSONArray messages) {
-            //super.onPostExecute(messages);
+            super.onPostExecute(messages);
             Message tmpMessage;
             JSONObject message;
+
+            if (messages == null) return;
 
             try {
                 for (int i = 0; i < messages.length(); i++) {
@@ -192,8 +220,11 @@ public class MainActivity extends ActionBarActivity {
                 }
             } catch (JSONException jsone) {
                 Log.e("Main: ", jsone.getMessage());
+            } catch (Exception e) {
+                Log.e("Main: ", e.getMessage());
             }
 
+            pDialog.dismiss();
             updateList();
         }
     }

@@ -20,9 +20,6 @@ public class SessionManager {
     // Shared pref mode
     int PRIVATE_MODE = 0;
 
-    // TODO: Adresse anpassen
-    private static final String URL_LOGIN = "http://iwap3.informatik.htw-dresden.de/oracle/";
-
     // Sharedpref file name
     private static final String PREF_NAME = "ToBriPref";
 
@@ -79,16 +76,18 @@ public class SessionManager {
             // Add new Flag to start new Activity
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            // Staring Login Activity
+            // Starting Login Activity
             _context.startActivity(i);
         }
 
     }
 
     public boolean loginUser(String username, String password) {
-        HTTPConnector httpConnector = new HTTPConnector(URL_LOGIN);
-        // ToDo: Daten über HTTP mit Oracle
+        HTTPConnector httpConnector = new HTTPConnector();
         String currentHash = httpConnector.login(username, password);
+        if (currentHash == null) {
+            return false;
+        }
         this.createLoginSession(username, currentHash, password);
         return true;
     }
