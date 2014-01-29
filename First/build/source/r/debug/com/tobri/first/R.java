@@ -854,7 +854,6 @@ containing a value of this type.
         public static final int fail=0x7f020057;
         public static final int ic_launcher=0x7f020058;
         public static final int success=0x7f020059;
-        public static final int tobri=0x7f02005a;
     }
     public static final class id {
         public static final int action_bar=0x7f07001c;

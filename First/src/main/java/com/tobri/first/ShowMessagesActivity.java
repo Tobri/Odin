@@ -1,6 +1,8 @@
 package com.tobri.first;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,7 +47,9 @@ public class ShowMessagesActivity extends ActionBarActivity {
     protected EditText txtInput;
     protected Button btnSend;
 
-    protected ProgressDialog pDialog;
+    TCPConnector tcpConnector;
+    Activity activity;
+    Context context;
 
     String sender;
 
@@ -54,11 +58,14 @@ public class ShowMessagesActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_messages);
 
+        activity = this;
+        context = getApplicationContext();
+
         // Session class instance
-        session = new SessionManager(getApplicationContext());
+        session = new SessionManager(context);
         session.checkLogin();
 
-        dbc = new DBConnector(this);
+        dbc = new DBConnector(context);
         lblSender = (TextView) findViewById(R.id.lblSender);
         lvMessages = (ListView) findViewById(R.id.lvMessages);
         txtInput = (EditText) findViewById(R.id.txtInput);
@@ -67,7 +74,7 @@ public class ShowMessagesActivity extends ActionBarActivity {
         Intent intent = getIntent();
         sender = intent.getStringExtra("sender");
 
-        lblSender.setText(Html.fromHtml("Sender: <b>" + sender + "</b>"));
+        lblSender.setText("Sender: " + sender);
 
         updateList(sender);
 
@@ -84,7 +91,7 @@ public class ShowMessagesActivity extends ActionBarActivity {
                             TCPConnector.SERVER_SET,
                             tmpMessage.toJSON().toString()
                     };
-                    TCPConnector tcpConnector = new TCPConnector();
+                    tcpConnector = new TCPConnector(activity, context);
                     if (tcpConnector.getStatus() != AsyncTask.Status.RUNNING) {
                         tcpConnector.execute(params);
                     }
@@ -105,84 +112,84 @@ public class ShowMessagesActivity extends ActionBarActivity {
         }
     }
 
-    private class TCPConnector extends AsyncTask<String, Integer, JSONObject> {
-        protected Socket                socket;
-        protected PrintWriter           out;
-        protected BufferedReader        in;
-        protected static final String   SERVER_IP   = "141.56.133.103";
-        protected static final int      SERVER_PORT = 8010;
-
-        public static final String      SERVER_GET  = "get";
-        public static final String      SERVER_SET  = "set";
-        public static final String      SERVER_REM  = "rem";
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(ShowMessagesActivity.this);
-            pDialog.setMessage("Sending Message...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... strings) {
-            JSONObject result = null;
-
-            try {
-                InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
-                socket = new Socket(serverAddress, SERVER_PORT);
-                socket.setSoTimeout(600);
-                socket.setSoLinger(true, 600);
-                socket.setKeepAlive(false);
-                socket.setReceiveBufferSize(4096);
-            } catch (UnknownHostException uhe) {
-                Log.e("UHE: ", uhe.getMessage());
-            } catch (IOException ioe) {
-                Log.e("IOE: ", ioe.getMessage());
-            } catch (NullPointerException npe) {
-                Log.e("NPE: ", npe.getMessage());
-            }
-
-            String tmp = strings[0] + " " + strings[1];
-            try {
-                char buffer[] = new char[4096];
-                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                out.write(tmp);
-                out.flush();
-
-                in.read(buffer, 0, 4096);
-
-                result = new JSONObject(strings[1]);
-                socket.close();
-            } catch (IOException ioe) {
-                Log.e("IOE: ", ioe.getMessage());
-            } catch (JSONException jsone) {
-                Log.e("IOE: ", jsone.getMessage());
-            } catch (NullPointerException npe) {
-                Log.e("NPE: ", npe.getMessage());
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject message) {
-            super.onPostExecute(message);
-
-            try {
-                dbc.addMessage(new Message(message));
-            } catch (JSONException jsone) {
-                Log.e("JSONE: ", jsone.getMessage());
-            }
-            txtInput.setText("");
-            updateList(sender);
-            pDialog.dismiss();
-        }
-    }
+//    private class TCPConnector extends AsyncTask<String, Integer, JSONObject> {
+//        protected Socket                socket;
+//        protected PrintWriter           out;
+//        protected BufferedReader        in;
+//        protected static final String   SERVER_IP   = "141.56.133.103";
+//        protected static final int      SERVER_PORT = 8010;
+//
+//        public static final String      SERVER_GET  = "get";
+//        public static final String      SERVER_SET  = "set";
+//        public static final String      SERVER_REM  = "rem";
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            pDialog = new ProgressDialog(ShowMessagesActivity.this);
+//            pDialog.setMessage("Sending Message...");
+//            pDialog.setIndeterminate(false);
+//            pDialog.setCancelable(true);
+//            pDialog.show();
+//        }
+//
+//        @Override
+//        protected JSONObject doInBackground(String... strings) {
+//            JSONObject result = null;
+//
+//            try {
+//                InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
+//                socket = new Socket(serverAddress, SERVER_PORT);
+//                socket.setSoTimeout(600);
+//                socket.setSoLinger(true, 600);
+//                socket.setKeepAlive(false);
+//                socket.setReceiveBufferSize(4096);
+//            } catch (UnknownHostException uhe) {
+//                Log.e("UHE: ", uhe.getMessage());
+//            } catch (IOException ioe) {
+//                Log.e("IOE: ", ioe.getMessage());
+//            } catch (NullPointerException npe) {
+//                Log.e("NPE: ", npe.getMessage());
+//            }
+//
+//            String tmp = strings[0] + " " + strings[1];
+//            try {
+//                char buffer[] = new char[4096];
+//                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+//                in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//
+//                out.write(tmp);
+//                out.flush();
+//
+//                in.read(buffer, 0, 4096);
+//
+//                result = new JSONObject(strings[1]);
+//                socket.close();
+//            } catch (IOException ioe) {
+//                Log.e("IOE: ", ioe.getMessage());
+//            } catch (JSONException jsone) {
+//                Log.e("IOE: ", jsone.getMessage());
+//            } catch (NullPointerException npe) {
+//                Log.e("NPE: ", npe.getMessage());
+//            }
+//
+//            return result;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(JSONObject message) {
+//            super.onPostExecute(message);
+//
+//            try {
+//                dbc.addMessage(new Message(message));
+//            } catch (JSONException jsone) {
+//                Log.e("JSONE: ", jsone.getMessage());
+//            }
+//            txtInput.setText("");
+//            updateList(sender);
+//            pDialog.dismiss();
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
