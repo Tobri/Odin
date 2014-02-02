@@ -20,7 +20,7 @@ import java.util.List;
 public class DBConnector extends SQLiteOpenHelper {
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Database Name
     private static final String DATABASE_NAME = "messagesManager";
@@ -29,12 +29,13 @@ public class DBConnector extends SQLiteOpenHelper {
     private static final String TABLE_MESSAGES = "messages";
 
     // Messages Table Columns names
-    private static final String KEY_ID = "id";
-    private static final String KEY_SENDER = "name";
-    private static final String KEY_RCVR = "receiver";
-    private static final String KEY_RCVD = "received";
-    private static final String KEY_TEXT = "text";
-    private static final String KEY_ADDITIONAL = "additional";
+    private static final String KEY_ID          = "id";
+    private static final String KEY_OBJECTID    = "objectid";
+    private static final String KEY_SENDER      = "name";
+    private static final String KEY_RCVR        = "receiver";
+    private static final String KEY_RCVD        = "received";
+    private static final String KEY_TEXT        = "text";
+    private static final String KEY_ADDITIONAL  = "additional";
 
     public DBConnector(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -44,12 +45,13 @@ public class DBConnector extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_MESSAGES_TABLE =
                 "CREATE TABLE " + TABLE_MESSAGES + "("
-                        + KEY_ID + " INTEGER PRIMARY KEY,"
-                        + KEY_SENDER + " TEXT,"
-                        + KEY_RCVR + " TEXT,"
-                        + KEY_RCVD + " TEXT,"
-                        + KEY_TEXT + " TEXT,"
-                        + KEY_ADDITIONAL + " TEXT"
+                        + KEY_ID            + " INTEGER PRIMARY KEY,"
+                        + KEY_OBJECTID      + " TEXT,"
+                        + KEY_SENDER        + " TEXT,"
+                        + KEY_RCVR          + " TEXT,"
+                        + KEY_RCVD          + " TEXT,"
+                        + KEY_TEXT          + " TEXT,"
+                        + KEY_ADDITIONAL    + " TEXT"
                         + ")";
         db.execSQL(CREATE_MESSAGES_TABLE);
     }
@@ -69,43 +71,85 @@ public class DBConnector extends SQLiteOpenHelper {
 
     // Adding new message
     long addMessage(Message message) {
-        long ret = 0;
+        long ret;
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(KEY_OBJECTID, message.getObjectid());
         values.put(KEY_SENDER, message.getSender());
         values.put(KEY_RCVR, message.getReceiver());
         values.put(KEY_RCVD, message.getReceived());
         values.put(KEY_TEXT, message.getMessage());
         values.put(KEY_ADDITIONAL, message.getAdditional().toString());
+        
+        if (getMessageID(message.getObjectid()) != null) {
+            ret = updateMessage(message);
+        } else {
+            // Inserting Row
+            assert db != null;
+            ret = db.insert(TABLE_MESSAGES, null, values);
+        }
 
-        // Inserting Row
-        ret = db.insert(TABLE_MESSAGES, null, values);
         db.close(); // Closing database connection
         return ret;
     }
 
+    Long getMessageID(String objectid) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        
+        Cursor cursor = null;
+        
+        try {
+            assert db != null;
+            cursor = db.query(TABLE_MESSAGES,
+                    new String[]{KEY_ID},
+                    KEY_OBJECTID + "=?", new String[]{objectid}, null, null, null);
+            assert cursor != null;
+            cursor.moveToFirst();
+        } catch (NullPointerException npe) {
+            Log.e("DBConnector: ", npe.getMessage());
+        }
+
+        if (cursor == null) {
+            return null;
+        }
+        cursor.moveToFirst();
+
+        try {
+            return Long.decode(cursor.getString(0));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     // Getting single message
-    Message getMessage(int id) throws JSONException {
+    Message getMessage(Long id) throws JSONException {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_MESSAGES,
-                new String[]{KEY_ID, KEY_SENDER, KEY_RCVR, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL},
+        Cursor cursor = null;
+
+        try {
+            assert db != null;
+            cursor = db.query(TABLE_MESSAGES,
+                new String[]{KEY_ID, KEY_OBJECTID, KEY_SENDER, KEY_RCVR, KEY_RCVD, KEY_TEXT, KEY_ADDITIONAL},
                 KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
+        } catch (NullPointerException npe) {
+            Log.e("DBConnector: ", npe.getMessage());
+        }
 
         if (cursor != null)
             cursor.moveToFirst();
 
-        Message message = new Message(
-                Integer.parseInt(cursor.getString(0)),
+        // return message
+        return new Message(
+                Long.decode(cursor.getString(0)),
                 cursor.getString(1),
                 cursor.getString(2),
                 cursor.getString(3),
                 cursor.getString(4),
-                new JSONArray(cursor.getString(5))
+                cursor.getString(5),
+                new JSONArray(cursor.getString(6))
         );
-        // return message
-        return message;
     }
 
     // Getting All Messages
@@ -115,19 +159,20 @@ public class DBConnector extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES;
 
         SQLiteDatabase db = this.getWritableDatabase();
+        assert db != null;
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
                 Message message = new Message();
-                message.setId(Integer.parseInt(cursor.getString(0)));
-                message.setSender(cursor.getString(1));
-                message.setReceiver(cursor.getString(2));
-                message.setReceived(cursor.getString(3));
-                message.setMessage(cursor.getString(4));
-                Log.e("Message: ", cursor.getString(5));
-                message.setAdditional(new JSONArray(cursor.getString(5)));
+                message.setId(Long.decode(cursor.getString(0)));
+                message.setObjectid(cursor.getString(1));
+                message.setSender(cursor.getString(2));
+                message.setReceiver(cursor.getString(3));
+                message.setReceived(cursor.getString(4));
+                message.setMessage(cursor.getString(5));
+                message.setAdditional(new JSONArray(cursor.getString(6)));
 
                 // Adding message to list
                 messageList.add(message);
@@ -144,21 +189,24 @@ public class DBConnector extends SQLiteOpenHelper {
         // Select All Query
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
                 + " WHERE " + KEY_SENDER + " LIKE '" + sender + "'"
-                + " OR " + KEY_RCVR + " LIKE '" + sender + "'";
+                + " OR " + KEY_RCVR + " LIKE '" + sender + "'"
+                + " ORDER BY " + KEY_RCVD;
 
         SQLiteDatabase db = this.getWritableDatabase();
+        assert db != null;
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
                 Message message = new Message();
-                message.setId(Integer.parseInt(cursor.getString(0)));
-                message.setSender(cursor.getString(1));
-                message.setReceiver(cursor.getString(2));
-                message.setReceived(cursor.getString(3));
-                message.setMessage(cursor.getString(4));
-                message.setAdditional(new JSONArray(cursor.getString(5)));
+                message.setId(Long.decode(cursor.getString(0)));
+                message.setObjectid(cursor.getString(1));
+                message.setSender(cursor.getString(2));
+                message.setReceiver(cursor.getString(3));
+                message.setReceived(cursor.getString(4));
+                message.setMessage(cursor.getString(5));
+                message.setAdditional(new JSONArray(cursor.getString(6)));
 
                 // Adding message to list
                 messageList.add(message);
@@ -180,6 +228,7 @@ public class DBConnector extends SQLiteOpenHelper {
                 + " WHERE " + KEY_RCVR + " LIKE \"" + username + "\"";
 
         SQLiteDatabase db = this.getWritableDatabase();
+        assert db != null;
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
@@ -199,6 +248,7 @@ public class DBConnector extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(KEY_OBJECTID, message.getObjectid());
         values.put(KEY_SENDER, message.getSender());
         values.put(KEY_RCVR, message.getReceiver());
         values.put(KEY_RCVD, message.getReceived());
@@ -206,13 +256,15 @@ public class DBConnector extends SQLiteOpenHelper {
         values.put(KEY_ADDITIONAL, message.getAdditional().toString());
 
         // updating row
-        return db.update(TABLE_MESSAGES, values, KEY_ID + " = ?",
+        assert db != null;
+        return db.update(TABLE_MESSAGES, values, KEY_ID + "=?",
                 new String[]{String.valueOf(message.getId())});
     }
 
     // Deleting single message
     public void deleteMessage(Message message) {
         SQLiteDatabase db = this.getWritableDatabase();
+        assert db != null;
         db.delete(TABLE_MESSAGES, KEY_ID + " = ?",
                 new String[]{String.valueOf(message.getId())});
         db.close();
@@ -222,6 +274,7 @@ public class DBConnector extends SQLiteOpenHelper {
     public int getMessagesCount() {
         String countQuery = "SELECT  * FROM " + TABLE_MESSAGES;
         SQLiteDatabase db = this.getReadableDatabase();
+        assert db != null;
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.close();
         db.close();
@@ -232,6 +285,7 @@ public class DBConnector extends SQLiteOpenHelper {
 
     public void dropAll() {
         SQLiteDatabase db = this.getWritableDatabase();
+        assert db != null;
         db.delete(TABLE_MESSAGES, KEY_ID + " >= ?", new String[]{"1"});
         db.close();
     }

@@ -1,15 +1,8 @@
 package com.tobri.first;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -30,20 +23,17 @@ public class TCPConnector extends AsyncTask<String, Integer, String> {
     protected static final String   SERVER_IP   = "141.56.133.103";
     protected static final int      SERVER_PORT = 8010;
 
-    public static final String  SERVER_GET  = "get";
-    public static final String  SERVER_SET  = "set";
-    public static final String  SERVER_REM  = "rem";
+    public static final String      SERVER_GET  = "get";
+    public static final String      SERVER_SET  = "set";
+    public static final String      SERVER_REM  = "rem";
 
-    public Activity activity;
-    public Context context;
-    public ProgressDialog pDialog;
-    public DBConnector dbc;
-    public String method;
+    public ISender                  context;
+    public DBConnector              dbc;
+    public String                   method;
 
-    public TCPConnector(Activity activity,Context context) {
-        this.activity = activity;
+    public TCPConnector(ISender context) {
         this.context = context;
-        dbc = new DBConnector(context);
+        dbc = new DBConnector(context.getContext());
     }
 
     @Override
@@ -93,44 +83,8 @@ public class TCPConnector extends AsyncTask<String, Integer, String> {
     }
 
     @Override
-    protected void onPreExecute() {
-        pDialog = new ProgressDialog(context);
-        pDialog.setMessage("Work in Progress");
-        pDialog.setIndeterminate(false);
-        pDialog.setCancelable(true);
-        pDialog.show();
-    }
-
-    @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        Message tmpMessage;
-        JSONArray messages;
-        JSONObject message;
-
-        if (s == null) {
-            return;
-        } else if (method.equals(SERVER_GET)){
-            try {
-                messages = new JSONArray(s);
-                for (int i = 0; i < messages.length(); i++) {
-                    message    = messages.getJSONObject(i);
-                    tmpMessage = new Message(message);
-                    dbc.addMessage(tmpMessage);
-                    TCPConnector tcpConnector = new TCPConnector(activity, context);
-                    String params[] = {
-                            SERVER_REM,
-                            tmpMessage.getId().toString()
-                    };
-                    tcpConnector.execute(params);
-                }
-            } catch (JSONException jsone) {
-                Log.e("Main: ", jsone.getMessage());
-            } catch (Exception e) {
-                Log.e("Main: ", e.getMessage());
-            }
-        }
-
-        pDialog.dismiss();
+        context.callback(s);
     }
 }

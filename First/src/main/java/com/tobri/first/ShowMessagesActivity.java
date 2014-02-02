@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,29 +16,14 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.text.DateFormat;
 import java.util.Date;
 
-public class ShowMessagesActivity extends ActionBarActivity {
-
-    AlertDialogManager alert = new AlertDialogManager();
+public class ShowMessagesActivity extends Activity implements ISender {
 
     SessionManager session;
     DBConnector dbc;
+    ProgressDialog pDialog;
 
     protected TextView lblSender;
     protected ListView lvMessages;
@@ -48,8 +31,8 @@ public class ShowMessagesActivity extends ActionBarActivity {
     protected Button btnSend;
 
     TCPConnector tcpConnector;
-    Activity activity;
     Context context;
+    ISender iSender;
 
     String sender;
 
@@ -58,8 +41,8 @@ public class ShowMessagesActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_messages);
 
-        activity = this;
-        context = getApplicationContext();
+        context = this;
+        iSender = this;
 
         // Session class instance
         session = new SessionManager(context);
@@ -82,7 +65,7 @@ public class ShowMessagesActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    Message tmpMessage = new Message(null,
+                    Message tmpMessage = new Message(null, null,
                             session.getUserDetails().get(SessionManager.KEY_NAME),
                             sender,
                             Long.toString(new Date().getTime()),
@@ -91,8 +74,13 @@ public class ShowMessagesActivity extends ActionBarActivity {
                             TCPConnector.SERVER_SET,
                             tmpMessage.toJSON().toString()
                     };
-                    tcpConnector = new TCPConnector(activity, context);
+                    tcpConnector = new TCPConnector(iSender);
                     if (tcpConnector.getStatus() != AsyncTask.Status.RUNNING) {
+                        pDialog = new ProgressDialog(context);
+                        pDialog.setMessage("Work in Progress");
+                        pDialog.setIndeterminate(false);
+                        pDialog.setCancelable(true);
+                        pDialog.show();
                         tcpConnector.execute(params);
                     }
                 } catch (JSONException jsone) {
@@ -111,85 +99,6 @@ public class ShowMessagesActivity extends ActionBarActivity {
             Log.e("Exception: ", e.getMessage());
         }
     }
-
-//    private class TCPConnector extends AsyncTask<String, Integer, JSONObject> {
-//        protected Socket                socket;
-//        protected PrintWriter           out;
-//        protected BufferedReader        in;
-//        protected static final String   SERVER_IP   = "141.56.133.103";
-//        protected static final int      SERVER_PORT = 8010;
-//
-//        public static final String      SERVER_GET  = "get";
-//        public static final String      SERVER_SET  = "set";
-//        public static final String      SERVER_REM  = "rem";
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            pDialog = new ProgressDialog(ShowMessagesActivity.this);
-//            pDialog.setMessage("Sending Message...");
-//            pDialog.setIndeterminate(false);
-//            pDialog.setCancelable(true);
-//            pDialog.show();
-//        }
-//
-//        @Override
-//        protected JSONObject doInBackground(String... strings) {
-//            JSONObject result = null;
-//
-//            try {
-//                InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
-//                socket = new Socket(serverAddress, SERVER_PORT);
-//                socket.setSoTimeout(600);
-//                socket.setSoLinger(true, 600);
-//                socket.setKeepAlive(false);
-//                socket.setReceiveBufferSize(4096);
-//            } catch (UnknownHostException uhe) {
-//                Log.e("UHE: ", uhe.getMessage());
-//            } catch (IOException ioe) {
-//                Log.e("IOE: ", ioe.getMessage());
-//            } catch (NullPointerException npe) {
-//                Log.e("NPE: ", npe.getMessage());
-//            }
-//
-//            String tmp = strings[0] + " " + strings[1];
-//            try {
-//                char buffer[] = new char[4096];
-//                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-//                in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//
-//                out.write(tmp);
-//                out.flush();
-//
-//                in.read(buffer, 0, 4096);
-//
-//                result = new JSONObject(strings[1]);
-//                socket.close();
-//            } catch (IOException ioe) {
-//                Log.e("IOE: ", ioe.getMessage());
-//            } catch (JSONException jsone) {
-//                Log.e("IOE: ", jsone.getMessage());
-//            } catch (NullPointerException npe) {
-//                Log.e("NPE: ", npe.getMessage());
-//            }
-//
-//            return result;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(JSONObject message) {
-//            super.onPostExecute(message);
-//
-//            try {
-//                dbc.addMessage(new Message(message));
-//            } catch (JSONException jsone) {
-//                Log.e("JSONE: ", jsone.getMessage());
-//            }
-//            txtInput.setText("");
-//            updateList(sender);
-//            pDialog.dismiss();
-//        }
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -212,5 +121,18 @@ public class ShowMessagesActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void callback(String result) {
+
+        updateList(sender);
+        txtInput.setText("");
+        pDialog.dismiss();
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 }

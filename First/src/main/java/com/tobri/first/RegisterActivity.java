@@ -55,7 +55,7 @@ public class RegisterActivity extends Activity {
         setContentView(R.layout.activity_register);
 
 
-        context = getApplicationContext();
+        context = this;
         session = new SessionManager(context);
 
         txtSalutation = (EditText) findViewById(R.id.txtSalutation);
@@ -113,12 +113,16 @@ public class RegisterActivity extends Activity {
                                 location,
                                 email
                         };
-                        doRegister.execute(params);
+                        if (doRegister.getStatus() != AsyncTask.Status.RUNNING) {
+                            doRegister.execute(params);
+                        }
                     } else {
+                        Toast.makeText(context, "Passwörter stimmen nicht überein...", Toast.LENGTH_LONG).show();
                         Log.e("Register: ", "Passwörter stimmen nicht überein...");
                     }
                 } else {
                     // Feld(er) vergessen
+                    Toast.makeText(context, "Felder vergessen!", Toast.LENGTH_LONG).show();
                     Log.e("Register: ", "Felder vergessen");
                 }
             }

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.test.RenamingDelegatingContext;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,40 +18,24 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity implements ISender {
     // Database Connector
     public static DBConnector dbc;
-
-    // Alert Dialog Manager
-    AlertDialogManager alert = new AlertDialogManager();
 
     // Session Manager Class
     SessionManager session;
 
-    TCPConnector tcpConnector;
+    TCPConnector tcpConnector = null;
     Context context;
-    Activity activity;
+    ISender iSender;
+    ProgressDialog pDialog;
 
     // Activity elements
     ListView lvSenders;
@@ -63,13 +48,13 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        activity = this;
-        context = getApplicationContext();
+        context         = this;
+        iSender         = this;
 
-        lblName = (TextView) findViewById(R.id.lblName);
-        lvSenders = (ListView) findViewById(R.id.lvSenders);
-        btnReceive = (Button) findViewById(R.id.btnReceive);
-        btnNewMessage = (Button) findViewById(R.id.btnNewMessage);
+        lblName         = (TextView) findViewById(R.id.lblName);
+        lvSenders       = (ListView) findViewById(R.id.lvSenders);
+        btnReceive      = (Button) findViewById(R.id.btnReceive);
+        btnNewMessage   = (Button) findViewById(R.id.btnNewMessage);
 
         // Session class instance
         session = new SessionManager(context);
@@ -114,8 +99,13 @@ public class MainActivity extends ActionBarActivity {
                         TCPConnector.SERVER_GET,
                         session.getUserDetails().get(SessionManager.KEY_NAME),
                 };
-                tcpConnector = new TCPConnector(activity, context);
+                tcpConnector = new TCPConnector(iSender);
                 if (tcpConnector.getStatus() != AsyncTask.Status.RUNNING) {
+                    pDialog = new ProgressDialog(context);
+                    pDialog.setMessage("Work in Progress");
+                    pDialog.setIndeterminate(false);
+                    pDialog.setCancelable(true);
+                    pDialog.show();
                     tcpConnector.execute(params);
                 }
             }
@@ -130,119 +120,12 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (tcpConnector != null) {
-            if (tcpConnector.getStatus() == AsyncTask.Status.FINISHED) {
-                updateList();
-            }
-        }
-    }
-
-
     public void updateList() {
         String username = session.getUserDetails().get(SessionManager.KEY_NAME);
         final ListAdapter listAdapter =
                 new ArrayAdapter(this, android.R.layout.simple_list_item_1, dbc.getAllSenders(username));
         lvSenders.setAdapter(listAdapter);
     }
-
-//    private class TCPConnector extends AsyncTask<String, Integer, JSONArray> {
-//        protected Socket                socket;
-//        protected PrintWriter           out;
-//        protected BufferedReader        in;
-//        protected static final String   SERVER_IP   = "141.56.133.103";
-//        protected static final int      SERVER_PORT = 8010;
-//
-//        public static final String      SERVER_GET  = "get";
-//        public static final String      SERVER_SET  = "set";
-//        public static final String      SERVER_REM  = "rem";
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            pDialog = new ProgressDialog(MainActivity.this);
-//            pDialog.setMessage("Fetching Messages...");
-//            pDialog.setIndeterminate(false);
-//            pDialog.setCancelable(true);
-//            pDialog.show();
-//        }
-//
-//        @Override
-//        protected JSONArray doInBackground(String... strings) {
-//            JSONArray result = null;
-//
-//            try {
-//                InetAddress serverAddress = InetAddress.getByName(SERVER_IP);
-//                socket = new Socket(serverAddress, SERVER_PORT);
-//                socket.setSoTimeout(600);
-//                socket.setSoLinger(true, 600);
-//                socket.setKeepAlive(false);
-//                socket.setReceiveBufferSize(4096);
-//            } catch (UnknownHostException uhe) {
-//                Log.e("UHE: ", uhe.getMessage());
-//            } catch (IOException ioe) {
-//                Log.e("IOE: ", ioe.getMessage());
-//            } catch (NullPointerException npe) {
-//                Log.e("NPE: ", npe.getMessage());
-//            } catch (Exception e) {
-//                Log.e("E: ", e.getMessage());
-//            }
-//
-//            String tmp = strings[0] + " " + strings[1];
-//
-//            try {
-//                char buffer[] = new char[4096];
-//                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-//                in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//
-//                out.write(tmp);
-//                out.flush();
-//
-//                in.read(buffer, 0, 4096);
-//                result = new JSONArray(new String(buffer));
-//                Log.e("Nachricht: ", result.getJSONObject(0).toString());
-//                socket.close();
-//            } catch (IOException ioe) {
-//                Log.e("IOE: ", ioe.getMessage());
-//            } catch (JSONException jsone) {
-//                Log.e("JSONE: ", jsone.getMessage());
-//            } catch (NullPointerException npe) {
-//                Log.e("NPE: ", npe.getMessage());
-//            } catch (Exception e) {
-//                Log.e("E: ", e.getMessage());
-//            }
-//
-//            return result;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(JSONArray messages) {
-//            super.onPostExecute(messages);
-//            Message tmpMessage;
-//            JSONObject message;
-//
-//            if (messages == null) return;
-//
-//            try {
-//                for (int i = 0; i < messages.length(); i++) {
-//                    message    = messages.getJSONObject(i);
-//                    tmpMessage = new Message(message);
-//                    Log.e("Sender (" + i + "): ", tmpMessage.toString());
-//                    dbc.addMessage(tmpMessage);
-//                }
-//            } catch (JSONException jsone) {
-//                Log.e("Main: ", jsone.getMessage());
-//            } catch (Exception e) {
-//                Log.e("Main: ", e.getMessage());
-//            }
-//
-//            pDialog.dismiss();
-//            updateList();
-//        }
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -265,5 +148,35 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void callback(String result) {
+        if (result == null) {
+            return;
+        }
+
+        JSONArray messages;
+        JSONObject message;
+        Message tmpMessage;
+
+        try {
+            messages = new JSONArray(result);
+            for (int i = 0; i < messages.length(); i++) {
+                message    = messages.getJSONObject(i);
+                tmpMessage = new Message(message);
+                dbc.addMessage(tmpMessage);
+            }
+        } catch (JSONException jsone) {
+            Log.e("Main: ", jsone.getMessage());
+        }
+
+        pDialog.dismiss();
+        updateList();
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 }
